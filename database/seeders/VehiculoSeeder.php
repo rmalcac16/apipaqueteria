@@ -11,10 +11,6 @@ class VehiculoSeeder extends Seeder
 {
     public function run(): void
     {
-        if (!in_array(App::environment(), ['local', 'dev'])) {
-            $this->command->warn('VehiculoSeeder no se ejecutó (no es entorno local/dev)');
-            return;
-        }
 
         // Tractocamiones
         foreach (range(1, 5) as $i) {

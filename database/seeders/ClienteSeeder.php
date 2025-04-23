@@ -10,10 +10,6 @@ class ClienteSeeder extends Seeder
 {
     public function run(): void
     {
-        if (!in_array(App::environment(), ['local', 'env'])) {
-            $this->command->warn('ClienteSeeder no se ejecutó (no es entorno local/env)');
-            return;
-        }
 
         DB::table('clientes')->insert([
             [

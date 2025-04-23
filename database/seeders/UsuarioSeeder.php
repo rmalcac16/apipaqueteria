@@ -11,10 +11,6 @@ class UsuarioSeeder extends Seeder
 {
     public function run(): void
     {
-        if (!in_array(App::environment(), ['local', 'env'])) {
-            $this->command->warn('UsuarioSeeder no se ejecutó (no es entorno local/env)');
-            return;
-        }
 
         // Agentes
         User::insert([
