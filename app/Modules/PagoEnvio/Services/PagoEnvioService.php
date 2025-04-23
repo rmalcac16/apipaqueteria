@@ -1,162 +1,83 @@
 <?php
 
-namespace Modules\PagoEnvio\Services;
+namespace Modules\Pago\Services;
 
 use App\Models\PagoEnvio;
-use App\Models\Envio;
-use App\Models\User;
-use App\Models\Agencia;
-use App\Models\Comprobante;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
-use Modules\Comprobantes\Services\ComprobanteService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
+use Modules\Comprobante\Services\ComprobanteService;
 
 class PagoEnvioService
+
 {
-    public function all()
-    {
-        return PagoEnvio::latest()->with(['envio', 'usuario', 'agencia', 'cliente'])->get();
-    }
+    private ComprobanteService $comprobanteService;
 
-    public function find($id): PagoEnvio
+    public function __construct(ComprobanteService $comprobanteService)
     {
-        return PagoEnvio::with(['envio', 'usuario', 'agencia', 'cliente'])->findOrFail($id);
+        $this->comprobanteService = $comprobanteService;
     }
 
 
-    public function findByEnvioId($envioId): PagoEnvio
+    public function getAll(): Collection
     {
-        return PagoEnvio::with(['envio', 'usuario', 'agencia', 'cliente'])->where('envio_id', $envioId)->firstOrFail();
+        return PagoEnvio::with([
+            'envio',
+            'envio.remitente',
+            'envio.destinatario',
+            'cliente',
+            'cobrador',
+            'agencia',
+            'comprobante',
+        ])->latest()->get();
     }
 
+    public function find(int $id): PagoEnvio
+    {
+        return PagoEnvio::with([
+            'envio',
+            'envio.remitente',
+            'envio.destinatario',
+            'cliente',
+            'cobrador',
+            'agencia',
+            'comprobante',
+        ])->findOrFail($id);
+    }
 
     public function create(array $data): PagoEnvio
     {
-        $pago = PagoEnvio::create($data);
-        $pago->update([
-            'fecha_pago' => now(),
-            'estado' => 'completado',
-            'cobrado_por' => Auth::id()
-        ]);
+        return DB::transaction(function () use ($data) {
+            $data['cobrado_por'] = $data['cobrado_por'] ?? Auth::id();
 
-        app(ComprobanteService::class)->crearComprobante($pago, $data['tipo_comprobante']);
+            $comprobanteData = $data['comprobante'] ?? null;
+            unset($data['comprobante']);
 
-        $pago->load('comprobante');
+            $pago = PagoEnvio::create($data);
 
-        return $pago;
+            if ($comprobanteData) {
+                $this->comprobanteService->crearDesdePago($pago, $comprobanteData);
+            }
+
+            return $this->find($pago->id);
+        });
     }
 
-
-    public function crearPagoPendiente(Envio $envio): PagoEnvio
+    public function update(int $id, array $data): PagoEnvio
     {
-        return PagoEnvio::create([
-            'envio_id' => $envio->id,
-            'monto' => $envio->flete_estimado,
-            'estado' => 'pendiente',
-            'forma_pago' => 'efectivo',
-            'agencia_id' => $envio->agencia_origen_id,
-            'realizado_por' => null,
-            'cobrado_por' => null,
-        ]);
+        return DB::transaction(function () use ($id, $data) {
+            $pago = PagoEnvio::findOrFail($id);
+            $pago->update($data);
+
+            return $this->find($pago->id);
+        });
     }
 
-    /**
-     * ✅ Actualiza un pago (usado para completar o cancelar)
-     */
-    public function update(PagoEnvio $pago, array $data): PagoEnvio
+    public function delete(int $id): void
     {
-        $envio = $pago->envio;
-
-        if (isset($data['monto']) && $data['monto'] > $envio->flete_estimado) {
-            throw ValidationException::withMessages([
-                'monto' => 'El monto no puede ser mayor al flete estimado del envío.'
-            ]);
-        }
-
-        $pago->update($data);
-
-        if ($data['estado'] === 'cancelado') {
-            $envio->update(['estado' => 'cancelado']);
-        }
-
-
-        return $pago;
-    }
-
-    public function delete(PagoEnvio $pago): bool
-    {
-        return $pago->delete();
-    }
-
-
-    public function cancelarPago(PagoEnvio $pago): PagoEnvio
-    {
-        $pago->update(['estado' => 'cancelado']);
-        $pago->envio->update(['estado' => 'cancelado']);
-        return $pago;
-    }
-
-
-    public function reporteDinamico($agenciaId = null, $fechaInicio = null, $fechaFin = null, $formaPago = null, $usuarioId = null)
-    {
-        $query = PagoEnvio::query()->with('envio', 'agencia', 'usuario', 'cliente');
-
-        if ($agenciaId) {
-            $query->where('agencia_id', $agenciaId);
-        }
-
-        if ($fechaInicio) {
-            $query->whereDate('created_at', '>=', $fechaInicio);
-        }
-
-        if ($fechaFin) {
-            $query->whereDate('created_at', '<=', $fechaFin);
-        }
-
-        if ($formaPago) {
-            $query->where('forma_pago', $formaPago);
-        }
-
-        if ($usuarioId) {
-            $query->where('cobrado_por', $usuarioId);
-        }
-
-        $pagos = $query->orderBy('created_at', 'desc')->get();
-        $total = $pagos->sum('monto');
-
-        return [
-            'pagos' => $pagos,
-            'total' => $total,
-            'filtros' => [
-                'agencia' => $agenciaId ? Agencia::find($agenciaId)?->nombre : 'Todas',
-                'fecha_inicio' => $fechaInicio,
-                'fecha_fin' => $fechaFin,
-                'forma_pago' => $formaPago ?? 'Todas',
-                'usuario' => $usuarioId ? User::find($usuarioId)?->nombreCompleto : 'Todos',
-            ],
-        ];
-    }
-
-
-
-
-
-    // Pagar
-
-    public function pagarEnvio(PagoEnvio $pagoEnvio, array $data): PagoEnvio
-    {
-        // Actualizar estado del pago a completado
-        $pagoEnvio->update([
-            'estado' => 'completado',
-            'fecha_pago' => now(),
-            'cobrado_por' => Auth::id(),
-            'realizado_por' => $pagoEnvio->envio->pagador_id,
-            'forma_pago' => $data['forma_pago'],
-            'medio_pago' => $data['medio_pago'] ?? null,
-            'numero_transaccion' => $data['numero_transaccion'] ?? null,
-            'observaciones' => $data['observaciones'] ?? null,
-        ]);
-
-        return $pagoEnvio;
+        DB::transaction(function () use ($id) {
+            $pago = PagoEnvio::findOrFail($id);
+            $pago->delete();
+        });
     }
 }

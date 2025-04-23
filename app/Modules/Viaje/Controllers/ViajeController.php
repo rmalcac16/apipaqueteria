@@ -3,143 +3,60 @@
 namespace Modules\Viaje\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Viaje;
-use Illuminate\Http\Request;
-use Modules\Envio\Services\EnvioService;
+use Illuminate\Http\JsonResponse;
+use Modules\Viaje\Services\ViajeService;
 use Modules\Viaje\Requests\StoreViajeRequest;
 use Modules\Viaje\Requests\UpdateViajeRequest;
-use Modules\Viaje\Services\ViajeService;
+use App\Models\Viaje;
+use Illuminate\Database\Eloquent\Collection;
 
 class ViajeController extends Controller
 {
-    public function __construct(protected ViajeService $service) {}
+    protected ViajeService $viajeService;
 
-    /**
-     * Listar viajes con filtros.
-     */
-    public function index(Request $request)
+    public function __construct(ViajeService $viajeService)
     {
-        return response()->json($this->service->buscar($request->all()));
+        $this->viajeService = $viajeService;
     }
 
     /**
-     * Mostrar un viaje por ID.
+     * Listar todos los viajes.
      */
-    public function show(int $id)
+    public function index(): Collection
     {
-        return response()->json($this->service->ver($id));
+        return $this->viajeService->getAll();
     }
 
     /**
-     * Crear nuevo viaje (solo admin).
+     * Registrar un nuevo viaje.
      */
-    public function store(StoreViajeRequest $request)
+    public function store(StoreViajeRequest $request): Viaje
     {
-        $viaje = $this->service->create($request->validated());
-        return response()->json($viaje, 201);
+        return $this->viajeService->store($request->validated());
     }
 
     /**
-     * Actualizar un viaje.
+     * Mostrar un viaje específico.
      */
-    public function update(UpdateViajeRequest $request, Viaje $viaje)
+    public function show(int $id): Viaje
     {
-        $updated = $this->service->update($viaje, $request->validated());
-        return response()->json($updated);
+        return $this->viajeService->find($id);
     }
 
     /**
-     * Cambiar conductor del viaje.
+     * Actualizar un viaje existente.
      */
-    public function cambiarConductor(Request $request, Viaje $viaje)
+    public function update(UpdateViajeRequest $request, int $id): Viaje
     {
-        $request->validate(['conductor_id' => 'required|exists:users,id']);
-        return response()->json($this->service->cambiarConductor($viaje, $request->conductor_id));
-    }
-
-    /**
-     * Cambiar vehículo del viaje.
-     */
-    public function cambiarVehiculo(Request $request, Viaje $viaje)
-    {
-        $request->validate(['vehiculo_id' => 'required|exists:vehiculos,id']);
-        return response()->json($this->service->cambiarVehiculo($viaje, $request->vehiculo_id));
-    }
-
-    /**
-     * Iniciar el viaje.
-     */
-    public function iniciar(Viaje $viaje)
-    {
-        return response()->json($this->service->iniciar($viaje));
-    }
-
-    /**
-     * Finalizar el viaje.
-     */
-    public function finalizar(Viaje $viaje)
-    {
-        return response()->json($this->service->finalizar($viaje));
-    }
-
-    /**
-     * Cancelar el viaje.
-     */
-    public function cancelar(Request $request, Viaje $viaje)
-    {
-        return response()->json(
-            $this->service->cancelar($viaje, $request->input('motivo'))
-        );
+        return $this->viajeService->updateById($id, $request->validated());
     }
 
     /**
      * Eliminar un viaje.
      */
-    public function destroy(Viaje $viaje)
+    public function destroy(int $id): JsonResponse
     {
-        $this->service->delete($viaje);
-        return response()->json(['message' => 'Viaje eliminado correctamente.']);
-    }
-
-
-    public function enviosDisponibles(Viaje $viaje)
-    {
-        $envios = \App\Models\Envio::query()
-            ->with([
-                'remitente:id,nombre_completo',
-                'destinatario:id,nombre_completo',
-                'seguimiento'
-            ])
-            ->whereNull('viaje_id')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return response()->json($envios);
-    }
-
-
-
-    public function asignarEnvios(Request $request, Viaje $viaje)
-    {
-        $request->validate([
-            'envios' => 'required|array|min:1',
-            'envios.*' => 'exists:envios,id',
-        ]);
-
-        $this->service->asignarEnvios($viaje, $request->envios);
-
-        return response()->json(['message' => 'Envíos asignados correctamente.']);
-    }
-
-    public function desasignarEnvios(Request $request, Viaje $viaje)
-    {
-        $request->validate([
-            'envios' => 'required|array|min:1',
-            'envios.*' => 'exists:envios,id',
-        ]);
-
-        $this->service->desasignarEnvios($viaje, $request->envios);
-
-        return response()->json(['message' => 'Envíos desasignados correctamente.']);
+        $this->viajeService->deleteById($id);
+        return response()->json(null, 204);
     }
 }

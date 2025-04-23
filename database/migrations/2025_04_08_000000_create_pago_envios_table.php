@@ -13,32 +13,30 @@ return new class extends Migration {
         Schema::create('pago_envios', function (Blueprint $table) {
             $table->id();
 
-            // Enlace al envío
+            // Enlace con el envío
             $table->foreignId('envio_id')->constrained('envios')->onDelete('cascade');
 
-            // Monto a pagar (no debe superar el flete del envío)
+            // Monto del pago
             $table->decimal('monto', 10, 2)->default(0);
 
             // Estado del pago
             $table->enum('estado', ['pendiente', 'completado', 'cancelado'])->default('pendiente');
 
-            // Método: cómo se pagó (efectivo, transferencia, etc.)
+            // Forma y medio de pago
             $table->enum('forma_pago', ['efectivo', 'transferencia', 'deposito'])->default('efectivo');
-
-            // Medio: a través de qué canal o app
             $table->enum('medio_pago', ['yape', 'plin', 'bcp', 'interbank', 'bbva', 'otros'])->nullable();
 
-            // Transacción y fecha
+            // Transacción
             $table->string('numero_transaccion')->nullable();
             $table->dateTime('fecha_pago')->nullable();
 
-            // Cliente que realizó el pago
-            $table->foreignId('realizado_por')->nullable()->constrained('clientes')->onDelete('restrict');
+            // Cliente que hizo el pago
+            $table->foreignId('realizado_por')->nullable()->constrained('clientes')->nullOnDelete();
 
-            // Usuario del sistema que lo registró (cajero, agente, admin)
+            // Usuario del sistema que registró el pago
             $table->foreignId('cobrado_por')->nullable()->constrained('users')->nullOnDelete();
 
-            // Agencia donde se hizo el pago
+            // Agencia donde se realizó el pago
             $table->foreignId('agencia_id')->nullable()->constrained('agencias')->nullOnDelete();
 
             $table->text('observaciones')->nullable();

@@ -2,46 +2,41 @@
 
 namespace Modules\Vehiculo\Services;
 
-use App\Events\VehiculosUpdated;
 use App\Models\Vehiculo;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 class VehiculoService
 {
-    public function all(array $filtros)
+    public function getAll(): Collection
     {
-        $query = Vehiculo::query()->with('carreta');
+        return Vehiculo::all();
+    }
 
-        $query->when(isset($filtros['placa']), function ($query) use ($filtros) {
-            $query->where('placa', 'like', '%' . $filtros['placa'] . '%');
+    public function find(int $id): Vehiculo
+    {
+        return Vehiculo::findOrFail($id);
+    }
+
+    public function store(array $data): Vehiculo
+    {
+        return DB::transaction(fn() => Vehiculo::create($data));
+    }
+
+    public function updateById(int $id, array $data): Vehiculo
+    {
+        return DB::transaction(function () use ($id, $data) {
+            $vehiculo = $this->find($id);
+            $vehiculo->update($data);
+            return $vehiculo;
         });
+    }
 
-        $query->when(isset($filtros['tipo']), function ($query) use ($filtros) {
-            $query->where('tipo', $filtros['tipo']);
+    public function deleteById(int $id): void
+    {
+        DB::transaction(function () use ($id) {
+            $vehiculo = $this->find($id);
+            $vehiculo->delete();
         });
-
-        return $query->get();
-    }
-
-    public function find(int $id)
-    {
-        return Vehiculo::with('carreta')->findOrFail($id);
-    }
-
-    public function create(array $data): Vehiculo
-    {
-        $data = Vehiculo::create($data);
-        return $data;
-    }
-
-    public function update(Vehiculo $vehiculo, array $data): Vehiculo
-    {
-        $vehiculo->update($data);
-        return $vehiculo;
-    }
-
-    public function delete(Vehiculo $vehiculo): bool
-    {
-        $vehiculo->delete();
-        return true;
     }
 }

@@ -3,126 +3,68 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Viaje extends Model
 {
-    use HasFactory;
-
-    // 🔹 Constantes de estado
-    public const ESTADO_PROGRAMADO = 'programado';
-    public const ESTADO_EN_TRANSITO = 'en_transito';
-    public const ESTADO_FINALIZADO = 'finalizado';
-    public const ESTADO_CANCELADO = 'cancelado';
-
-    // 🔹 Tipos de viaje
-    public const TIPO_NORMAL = 'normal';
-    public const TIPO_RETORNO = 'retorno';
-    public const TIPO_INTERNO = 'interno';
-
     protected $table = 'viajes';
 
     protected $fillable = [
         'codigo',
         'user_id',
-        'vehiculo_id',
-        'conductor_id',
+        'vehiculo_principal_id',
+        'vehiculo_secundario_id',
+        'conductor_principal_id',
+        'conductor_secundario_id',
         'agencia_origen_id',
         'agencia_destino_id',
-        'cantidad_envios',
-        'peso_total_estimado',
-        'volumen_total_estimado',
-        'tipo_carga',
-        'capacidad_usada',
-        'capacidad_maxima_permitida',
         'fecha_salida',
-        'fecha_llegada_estimada',
-        'fecha_llegada_real',
-        'hora_salida_programada',
-        'hora_salida_real',
-        'tiempo_estimado_viaje',
         'estado',
-        'estado_legible',
-        'aprobado_por',
-        'firma_digital_conductor',
-        'firma_digital_agencia_destino',
-        'manifiesto_generado',
-        'codigo_manifiesto',
-        'viaje_urgente',
-        'sincronizado_con_sunat',
-        'tipo_viaje',
-        'observaciones',
-        'observaciones_salida',
-        'observaciones_llegada',
     ];
 
     protected $casts = [
-        'manifiesto_generado' => 'boolean',
-        'viaje_urgente' => 'boolean',
-        'sincronizado_con_sunat' => 'boolean',
         'fecha_salida' => 'datetime',
-        'fecha_llegada_estimada' => 'datetime',
-        'fecha_llegada_real' => 'datetime',
     ];
 
-    // 🔹 Relaciones
-
-    public function creador()
+    // Quien creó el viaje
+    public function creadoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function vehiculo()
+    // Vehículo principal (tractocamión)
+    public function vehiculoPrincipal(): BelongsTo
     {
-        return $this->belongsTo(Vehiculo::class);
+        return $this->belongsTo(Vehiculo::class, 'vehiculo_principal_id');
     }
 
-    public function conductor()
+    // Vehículo secundario (remolque o semirremolque)
+    public function vehiculoSecundario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'conductor_id');
+        return $this->belongsTo(Vehiculo::class, 'vehiculo_secundario_id');
     }
 
-    public function aprobador()
+    // Conductor principal
+    public function conductorPrincipal(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'aprobado_por');
+        return $this->belongsTo(User::class, 'conductor_principal_id');
     }
 
-    public function agenciaOrigen()
+    // Conductor secundario (opcional)
+    public function conductorSecundario(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'conductor_secundario_id');
+    }
+
+    // Agencia origen
+    public function agenciaOrigen(): BelongsTo
     {
         return $this->belongsTo(Agencia::class, 'agencia_origen_id');
     }
 
-    public function agenciaDestino()
+    // Agencia destino
+    public function agenciaDestino(): BelongsTo
     {
         return $this->belongsTo(Agencia::class, 'agencia_destino_id');
-    }
-
-    public function envios()
-    {
-        return $this->hasMany(Envio::class);
-    }
-
-    // 🔹 Scopes útiles
-
-    public function scopePorEstado($query, string $estado)
-    {
-        return $query->where('estado', $estado);
-    }
-
-    public function scopeUrgentes($query)
-    {
-        return $query->where('viaje_urgente', true);
-    }
-
-    public function scopeEntreAgencias($query, int $origenId, int $destinoId)
-    {
-        return $query
-            ->where('agencia_origen_id', $origenId)
-            ->where('agencia_destino_id', $destinoId);
-    }
-
-    public function scopePorConductor($query, int $conductorId)
-    {
-        return $query->where('conductor_id', $conductorId);
     }
 }

@@ -20,18 +20,18 @@ class StoreClienteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tipo_documento' => [
+            'tipoDocumento' => [
                 'required',
                 'string',
                 'in:0,1,2,3,4,5,6,A,B,C,D,E,F',
             ],
-            'documento' => [
+            'numeroDocumento' => [
                 'required',
                 'string',
                 'max:30',
-                'unique:clientes,documento',
+                'unique:clientes,numeroDocumento',
             ],
-            'nombre_completo' => [
+            'nombreCompleto' => [
                 'required',
                 'string',
                 'max:255',
@@ -68,47 +68,50 @@ class StoreClienteRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'tipo_documento.required' => 'El tipo de documento es obligatorio.',
-            'tipo_documento.string'   => 'El tipo de documento debe ser una cadena de texto.',
-            'tipo_documento.in'       => 'El tipo de documento seleccionado no es válido.',
+            'tipoDocumento.required' => 'El tipo de documento es obligatorio.',
+            'tipoDocumento.string'   => 'El tipo de documento debe ser una cadena de texto.',
+            'tipoDocumento.in'       => 'El tipo de documento seleccionado no es válido.',
 
-            'documento.required'      => 'El número de documento es obligatorio.',
-            'documento.string'        => 'El número de documento debe ser una cadena de texto.',
-            'documento.unique'        => 'El número de documento ya está registrado.',
-            'documento.max'           => 'El número de documento no debe superar los 30 caracteres.',
+            'numeroDocumento.required' => 'El número de documento es obligatorio.',
+            'numeroDocumento.string'   => 'El número de documento debe ser una cadena de texto.',
+            'numeroDocumento.unique'   => 'El número de documento ya está registrado.',
+            'numeroDocumento.max'      => 'El número de documento no debe superar los 30 caracteres.',
 
-            'nombre_completo.required' => 'El nombre completo es obligatorio.',
-            'nombre_completo.max'      => 'El nombre completo no debe superar los 255 caracteres.',
+            'nombreCompleto.required' => 'El nombre completo es obligatorio.',
+            'nombreCompleto.string'   => 'El nombre completo debe ser una cadena de texto.',
+            'nombreCompleto.max'      => 'El nombre completo no debe superar los 255 caracteres.',
 
+            'direccion.string'        => 'La dirección debe ser una cadena de texto.',
             'direccion.max'           => 'La dirección no debe superar los 255 caracteres.',
 
             'telefono.required'       => 'El teléfono es obligatorio.',
+            'telefono.string'         => 'El teléfono debe ser una cadena de texto.',
             'telefono.regex'          => 'El formato del teléfono no es válido.',
             'telefono.max'            => 'El teléfono no debe superar los 20 caracteres.',
 
             'correo.email'            => 'El correo electrónico no es válido.',
             'correo.max'              => 'El correo electrónico no debe superar los 100 caracteres.',
 
-            'frecuente.boolean'       => 'El campo frecuente debe ser verdadero o falso.',
+            'frecuente.boolean'       => 'El campo cliente frecuente debe ser verdadero o falso.',
 
             'observaciones.string'    => 'Las observaciones deben ser una cadena de texto.',
         ];
     }
 
     /**
-     * Atributos personalizados para mostrar en los mensajes de error.
+     * Atributos personalizados para los mensajes de error.
      */
     public function attributes(): array
     {
         return [
-            'tipo_documento'  => 'tipo de documento',
-            'documento'       => 'número de documento',
-            'nombre_completo' => 'nombre completo',
-            'direccion'       => 'dirección',
-            'telefono'        => 'teléfono',
-            'correo'          => 'correo electrónico',
-            'frecuente'       => 'cliente frecuente',
-            'observaciones'   => 'observaciones',
+            'tipoDocumento'      => 'tipo de documento',
+            'numeroDocumento'    => 'número de documento',
+            'nombreCompleto'     => 'nombre completo',
+            'direccion'          => 'dirección',
+            'telefono'           => 'teléfono',
+            'correo'             => 'correo electrónico',
+            'frecuente'          => 'cliente frecuente',
+            'observaciones'      => 'observaciones',
         ];
     }
 }

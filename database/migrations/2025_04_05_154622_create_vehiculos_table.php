@@ -13,19 +13,23 @@ return new class extends Migration
     {
         Schema::create('vehiculos', function (Blueprint $table) {
             $table->id();
-            $table->enum('tipo', ['vehiculo', 'carreta']);
+
+            $table->enum('tipo', ['tractocamion', 'remolque', 'semirremolque']);
             $table->string('placa')->unique();
             $table->string('tuc')->unique();
             $table->string('marca')->nullable();
             $table->string('modelo')->nullable();
             $table->integer('anio')->nullable();
-            $table->decimal('capacidad_kg', 8, 2)->nullable();
-            $table->decimal('volumen_m3', 8, 2)->nullable();
+            $table->decimal('capacidadKg', 8, 2)->nullable();
+            $table->decimal('volumenM3', 8, 2)->nullable();
             $table->boolean('estado')->default(true);
-            $table->foreignId('carreta_id')
+
+            $table->foreignId('acopladoA_id')
                 ->nullable()
                 ->constrained('vehiculos')
-                ->nullOnDelete();
+                ->nullOnDelete()
+                ->comment('Vehículo al que está acoplado (remolque o semirremolque)');
+
             $table->timestamps();
         });
     }

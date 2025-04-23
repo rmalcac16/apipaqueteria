@@ -18,6 +18,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'admin@popeyecargo.com'],
             [
                 'name' => 'Administrador',
+                'numeroDocumento' => '12345678',
                 'password' => Hash::make('popeye2025'),
                 'email_verified_at' => now(),
                 'rol' => 'admin',

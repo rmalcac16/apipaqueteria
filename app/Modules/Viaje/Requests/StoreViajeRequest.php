@@ -3,6 +3,7 @@
 namespace Modules\Viaje\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreViajeRequest extends FormRequest
 {
@@ -14,47 +15,69 @@ class StoreViajeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehiculo_id' => 'required|exists:vehiculos,id',
-            'conductor_id' => 'required|exists:users,id',
-            'agencia_origen_id' => 'required|exists:agencias,id|different:agencia_destino_id',
-            'agencia_destino_id' => 'required|exists:agencias,id',
-            'fecha_salida' => 'required|date|after_or_equal:today',
-            'fecha_llegada_estimada' => 'nullable|date|after:fecha_salida',
-            'hora_salida_programada' => 'nullable|date_format:H:i',
-            'tipo_carga' => 'nullable|string|max:100',
-            'viaje_urgente' => 'sometimes|boolean',
-            'capacidad_usada' => 'nullable|numeric|min:0|max:100',
-            'capacidad_maxima_permitida' => 'nullable|numeric|min:0',
-            'tiempo_estimado_viaje' => 'nullable|integer|min:0',
-            'observaciones' => 'nullable|string',
+            'codigo'                  => 'required|string|max:50|unique:viajes,codigo',
+            'user_id'                 => 'required|exists:users,id',
+            'vehiculo_principal_id'   => 'required|exists:vehiculos,id',
+            'vehiculo_secundario_id'  => 'nullable|exists:vehiculos,id',
+            'conductor_principal_id'  => 'required|exists:users,id',
+            'conductor_secundario_id' => 'nullable|exists:users,id',
+            'agencia_origen_id'       => 'required|exists:agencias,id',
+            'agencia_destino_id'      => 'required|exists:agencias,id|different:agencia_origen_id',
+            'fecha_salida'            => 'required|date|after_or_equal:today',
+            'estado'                  => ['required', Rule::in(['programado', 'en_transito', 'finalizado', 'cancelado'])],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'codigo'                  => 'código',
+            'user_id'                 => 'usuario creador',
+            'vehiculo_principal_id'   => 'vehículo principal',
+            'vehiculo_secundario_id'  => 'vehículo secundario',
+            'conductor_principal_id'  => 'conductor principal',
+            'conductor_secundario_id' => 'conductor secundario',
+            'agencia_origen_id'       => 'agencia de origen',
+            'agencia_destino_id'      => 'agencia de destino',
+            'fecha_salida'            => 'fecha de salida',
+            'estado'                  => 'estado',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'vehiculo_id.required' => 'El vehículo es obligatorio.',
-            'vehiculo_id.exists' => 'El vehículo seleccionado no existe.',
-            'conductor_id.required' => 'El conductor es obligatorio.',
-            'conductor_id.exists' => 'El conductor seleccionado no existe.',
-            'agencia_origen_id.required' => 'La agencia de origen es obligatoria.',
-            'agencia_origen_id.exists' => 'La agencia de origen no es válida.',
-            'agencia_origen_id.different' => 'La agencia de origen debe ser diferente a la de destino.',
-            'agencia_destino_id.required' => 'La agencia de destino es obligatoria.',
-            'agencia_destino_id.exists' => 'La agencia de destino no es válida.',
-            'fecha_salida.required' => 'La fecha de salida es obligatoria.',
-            'fecha_salida.date' => 'La fecha de salida debe tener un formato válido.',
-            'fecha_salida.after_or_equal' => 'La fecha de salida no puede ser anterior a hoy.',
-            'fecha_llegada_estimada.date' => 'La fecha estimada de llegada debe ser válida.',
-            'fecha_llegada_estimada.after' => 'La llegada estimada debe ser posterior a la salida.',
-            'hora_salida_programada.date_format' => 'La hora de salida debe tener el formato HH:mm.',
-            'capacidad_usada.numeric' => 'La capacidad usada debe ser un número.',
-            'capacidad_usada.min' => 'La capacidad usada no puede ser menor a 0.',
-            'capacidad_usada.max' => 'La capacidad usada no puede ser mayor a 100.',
-            'capacidad_maxima_permitida.numeric' => 'La capacidad máxima permitida debe ser un número.',
-            'capacidad_maxima_permitida.min' => 'La capacidad máxima debe ser al menos 0.',
-            'tiempo_estimado_viaje.integer' => 'El tiempo estimado debe ser un número entero.',
-            'tiempo_estimado_viaje.min' => 'El tiempo estimado no puede ser negativo.',
+            'codigo.required'     => 'El :attribute es obligatorio.',
+            'codigo.unique'       => 'El :attribute ya ha sido registrado.',
+            'codigo.max'          => 'El :attribute no debe exceder los :max caracteres.',
+
+            'user_id.required'    => 'El :attribute es obligatorio.',
+            'user_id.exists'      => 'El :attribute seleccionado no existe.',
+
+            'vehiculo_principal_id.required' => 'El :attribute es obligatorio.',
+            'vehiculo_principal_id.exists'   => 'El :attribute seleccionado no existe.',
+
+            'vehiculo_secundario_id.exists'  => 'El :attribute seleccionado no existe.',
+
+            'conductor_principal_id.required' => 'El :attribute es obligatorio.',
+            'conductor_principal_id.exists'   => 'El :attribute seleccionado no existe.',
+
+            'conductor_secundario_id.exists'  => 'El :attribute seleccionado no existe.',
+
+            'agencia_origen_id.required' => 'La :attribute es obligatoria.',
+            'agencia_origen_id.exists'   => 'La :attribute seleccionada no existe.',
+
+            'agencia_destino_id.required' => 'La :attribute es obligatoria.',
+            'agencia_destino_id.exists'   => 'La :attribute seleccionada no existe.',
+            'agencia_destino_id.different' => 'La agencia de destino debe ser diferente a la de origen.',
+
+            'fecha_salida.required' => 'La :attribute es obligatoria.',
+            'fecha_salida.date'     => 'La :attribute debe ser una fecha válida.',
+            'fecha_salida.after_or_equal' => 'La :attribute no puede ser anterior a hoy.',
+
+            'estado.required' => 'El :attribute es obligatorio.',
+            'estado.in'       => 'El :attribute debe ser uno de los siguientes: programado, en_transito, finalizado, cancelado.',
         ];
     }
 }
+// Compare this snippet from app/Modules/Viaje/Models/Viaje.php:

@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Vehiculo extends Model
 {
+    protected $table = 'vehiculos';
+
     protected $fillable = [
         'tipo',
         'placa',
@@ -13,25 +17,48 @@ class Vehiculo extends Model
         'marca',
         'modelo',
         'anio',
-        'capacidad_kg',
-        'volumen_m3',
+        'capacidadKg',
+        'volumenM3',
         'estado',
-        'carreta_id',
+        'acopladoA_id',
     ];
 
     protected $casts = [
         'estado' => 'boolean',
-        'capacidad_kg' => 'decimal:2',
-        'volumen_m3' => 'decimal:2',
+        'capacidadKg' => 'float',
+        'volumenM3' => 'float',
+        'anio' => 'integer',
     ];
 
-    public function carreta()
+    /**
+     * 🚚 Vehículo al que está acoplado (por ejemplo: un tractocamión)
+     */
+    public function acopladoA(): BelongsTo
     {
-        return $this->belongsTo(Vehiculo::class, 'carreta_id');
+        return $this->belongsTo(Vehiculo::class, 'acopladoA_id');
     }
 
-    public function montadoEn()
+    /**
+     * 🚛 Vehículo enganchado a este (solo si este es un tractocamión)
+     */
+    public function enganchado(): HasOne
     {
-        return $this->hasOne(Vehiculo::class, 'carreta_id');
+        return $this->hasOne(Vehiculo::class, 'acopladoA_id');
+    }
+
+    /**
+     * Scope para tractocamiones
+     */
+    public function scopeTractocamiones($query)
+    {
+        return $query->where('tipo', 'tractocamion');
+    }
+
+    /**
+     * Scope para remolques y semirremolques
+     */
+    public function scopeCarretas($query)
+    {
+        return $query->whereIn('tipo', ['remolque', 'semirremolque']);
     }
 }

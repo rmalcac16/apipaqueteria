@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+
 class Envio extends Model
 {
     use HasFactory;
@@ -90,5 +91,16 @@ class Envio extends Model
     public function seguimiento()
     {
         return $this->hasMany(SeguimientoEnvio::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(EnvioItem::class);
+    }
+
+
+    public function guiaRemision()
+    {
+        return $this->hasOne(GuiaRemisionTransportista::class, 'envio_id');
     }
 }

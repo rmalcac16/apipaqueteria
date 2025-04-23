@@ -3,52 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Comprobante extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'pagoEnviosId',
-        'tipoComprobante',
+        'pago_envio_id',
+        'tipo',
         'serie',
-        'correlativo',
-        'clienteTipoDocumento',
-        'clienteNumeroDocumento',
-        'clienteNombre',
-        'clienteDireccion',
-        'detalleServicio',
-        'valorUnitario',
-        'igv',
-        'precioUnitario',
-        'montoTotal',
-        'unidadMedida',
-        'codigoProducto',
-        'tipoAfectacionIgv',
-        'fechaEmision',
-        'moneda',
-        'tipoPago',
+        'numero',
+        'forma_pago',
+        'monto_total',
         'estado',
-        'pdfPathA4',
-        'pdfPathTicket80',
-        'pdfPathTicket58',
-        'sunatEstado',
-        'sunatCodigoError',
-        'sunatMensajeError',
-        'sunatCdrPath',
-        'xmlPath',
-        'xmlHash',
+        'estado_sunat',
+        'xml_path',
+        'cdr_path',
+        'pdf_path',
+        'fecha_emision',
+        'cliente_id',
     ];
 
+    public function pago()
+    {
+        return $this->belongsTo(PagoEnvio::class, 'pago_envio_id');
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
+    }
 
     public function cuotas()
     {
-        return $this->hasMany(ComprobanteCuota::class, 'comprobanteId');
-    }
-
-    public function pagoEnvio()
-    {
-        return $this->belongsTo(PagoEnvio::class, 'pagoEnviosId');
+        return $this->hasMany(CuotaComprobante::class);
     }
 }

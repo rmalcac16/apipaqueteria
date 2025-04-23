@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Auth\Controllers\AuthController;
 use Modules\Agencia\Controllers\AgenciaController;
 use Modules\Cliente\Controllers\ClienteController;
-use Modules\Comprobantes\Controllers\ComprobanteController;
+use Modules\Comprobante\Controllers\ComprobanteController;
 use Modules\Dashboard\Controllers\DashboardController;
 use Modules\Usuario\Controllers\UsuarioController;
 use Modules\Vehiculo\Controllers\VehiculoController;
@@ -52,6 +52,10 @@ Route::middleware(['auth:sanctum', CheckRole::class . ':admin,agente'])->group(f
     Route::post('envios/buscarCodigo', [EnvioController::class, 'findByCodigo']);
 
     Route::prefix('envios/{envio}')->group(function () {
+        Route::get('pdf-a4', [EnvioController::class, 'verPdfA4']);
+        Route::get('ticket-80', [EnvioController::class, 'verTicket80']);
+        Route::get('ticket-58', [EnvioController::class, 'verTicket58']);
+
         Route::post('pagar', [PagoEnvioController::class, 'pagarEnvio']);
         Route::post('cancelar', [EnvioController::class, 'cancelar']);
         Route::get('seguimientos', [SeguimientoEnvioController::class, 'index']);
@@ -89,3 +93,24 @@ Route::middleware(['auth:sanctum', CheckRole::class . ':admin,agente'])->group(f
 });
 
 Route::get('tracking', [EnvioController::class, 'trackingEnvio']);
+
+
+Route::prefix('envios/{envio}')->group(function () {
+    Route::get('pdf-a4', [EnvioController::class, 'verPdfA4']);
+    Route::get('ticket-80', [EnvioController::class, 'verTicket80']);
+    Route::get('ticket-58', [EnvioController::class, 'verTicket58']);
+});
+
+
+Route::prefix('guias-remision-transportista/{GuiaRemisionTransportista}')->group(function () {
+    Route::get('pdf-a4', [GuiaRemisionTransportistaController::class, 'verPdfA4']);
+    Route::get('ticket-80', [GuiaRemisionTransportistaController::class, 'verTicket80']);
+    Route::get('ticket-58', [GuiaRemisionTransportistaController::class, 'verTicket58']);
+});
+
+
+Route::prefix('comprobantes/{Comprobante}')->group(function () {
+    Route::get('pdf-a4', [ComprobanteController::class, 'verPdfA4']);
+    Route::get('ticket-80', [ComprobanteController::class, 'verTicket80']);
+    Route::get('ticket-58', [ComprobanteController::class, 'verTicket58']);
+});

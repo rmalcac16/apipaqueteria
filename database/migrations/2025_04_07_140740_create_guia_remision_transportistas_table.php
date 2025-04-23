@@ -4,70 +4,56 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('guia_remision_transportistas', function (Blueprint $table) {
             $table->id();
 
-            $table->string('numero_documento')->unique()->comment('Número de la guía de remisión');
+            $table->foreignId('envio_id')->unique()->constrained('envios')->onDelete('cascade');
+            $table->foreignId('viaje_id')->nullable()->constrained('viajes')->nullOnDelete();
 
-            $table->foreignId('envio_id')->constrained()->onDelete('cascade');
+            $table->string('codigo')->unique();         // Ej: T001-000123
+            $table->string('serie')->nullable();        // Ej: T001
+            $table->integer('numero')->nullable();      // Ej: 123
 
-            // Conductor (fijado)
-            $table->string('conductor_nombre');
-            $table->string('conductor_tipo_documento');
-            $table->string('conductor_documento');
-            $table->string('conductor_licencia');
+            $table->dateTime('fecha_emision')->default(now());
+            $table->date('fecha_inicio_traslado')->default(now());
 
-            // Vehículo (fijado)
-            $table->string('vehiculo_placa');
-            $table->string('vehiculo_tuc')->nullable();
-            $table->string('vehiculo_certificado')->nullable();
+            $table->enum('estado', [
+                'borrador',
+                'generada',
+                'asignada',
+                'impresa',
+                'finalizada',
+                'anulada'
+            ])->default('generada');
 
-            // Traslado
-            $table->dateTime('fecha_inicio_traslado');
-            $table->string('modo_transporte')->default('01'); // Público
+            $table->enum('estado_sunat', [
+                'pendiente',
+                'enviada',
+                'rechazada',
+                'anulada'
+            ])->default('pendiente');
 
-            $table->string('punto_partida_ubigeo');
-            $table->string('punto_partida_direccion');
-            $table->string('punto_llegada_ubigeo');
-            $table->string('punto_llegada_direccion');
+            // Archivos PDF generados
+            $table->string('pdf_path_a4')->nullable();
+            $table->string('pdf_path_ticket_80')->nullable();
+            $table->string('pdf_path_ticket_58')->nullable();
 
-            // Datos del envío
-            $table->string('descripcion_carga');
-            $table->decimal('peso_total', 8, 2);
-            $table->string('unidad_medida')->default('KGM'); // Unidad de medida: KGM, TNE, etc.
+            // Archivos SUNAT
+            $table->string('xml_path')->nullable();
+            $table->string('cdr_path')->nullable();
+            $table->string('hash')->nullable();
 
-            $table->string('remitente_nombre');
-            $table->string('remitente_documento');
-
-            $table->string('destinatario_nombre');
-            $table->string('destinatario_documento');
-
-            // Pagador del servicio
-            $table->enum('pagador_tipo', ['remitente', 'destinatario', 'tercero']);
-            $table->string('pagador_tipo_documento')->nullable();
-            $table->string('pagador_numero_documento')->nullable();
-            $table->string('pagador_nombre_razon_social')->nullable();
-
-            // Interno
-            $table->enum('estado', ['pendiente', 'enviado', 'anulado'])->default('pendiente');
-            $table->string('pdf_path')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('guia_remision_transportistas');
+        Schema::dropIfExists('guia_remision_transportista');
     }
 };

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DocumentoSustentoGuiaTransportista extends Model
 {
     protected $fillable = [
-        'guia_remision_transportista_id',
+        'guia_remision_transportistas_id',
         'tipo_documento',
         'serie_numero',
         'ruc_emisor',
@@ -15,6 +15,6 @@ class DocumentoSustentoGuiaTransportista extends Model
 
     public function guia()
     {
-        return $this->belongsTo(GuiaRemisionTransportista::class, 'guia_remision_transportista_id');
+        return $this->belongsTo(GuiaRemisionTransportista::class, 'guia_remision_transportistas_id');
     }
 }

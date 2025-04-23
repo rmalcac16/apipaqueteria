@@ -3,225 +3,102 @@
 namespace Modules\Envio\Services;
 
 use App\Models\Envio;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Modules\SeguimientoEnvio\Services\SeguimientoEnvioService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
+use Modules\GuiaRemisionTransportista\Services\GuiaRemisionTransportistaService;
 
 class EnvioService
 {
-    public function all(Request $request)
+
+    protected GuiaRemisionTransportistaService $guiaRemisionTransportistaService;
+
+    public function __construct(GuiaRemisionTransportistaService $guiaRemisionTransportistaService)
     {
-        $query = Envio::query();
-        $query->with([
-            'user',
+        $this->guiaRemisionTransportistaService = $guiaRemisionTransportistaService;
+    }
+
+
+    /**
+     * Listar todos los envíos con relaciones.
+     */
+    public function getAll(): Collection
+    {
+        return Envio::with([
             'remitente',
             'destinatario',
             'pagador',
             'agenciaOrigen',
             'agenciaDestino',
-            'pago',
-            'seguimiento',
-            'seguimiento.usuario',
-        ]);
-        return $query->latest()->get();
+            'items',
+        ])->latest()->get();
     }
 
+    /**
+     * Buscar un envío por su ID con relaciones.
+     */
     public function find(int $id): Envio
     {
         return Envio::with([
-            'user',
             'remitente',
             'destinatario',
             'pagador',
             'agenciaOrigen',
             'agenciaDestino',
-            'pago',
-            'pago',
-            'seguimiento',
-            'seguimiento.usuario',
+            'items',
         ])->findOrFail($id);
     }
 
     public function create(array $data): Envio
     {
-        $data['user_id'] = Auth::id();
-        $envio = Envio::create($data);
+        return DB::transaction(function () use ($data) {
+            $data['user_id'] = $data['user_id'] ?? Auth::id() ?? 1;
+            $items = $data['items'] ?? [];
+            unset($data['items']);
 
+            $documentosSustento = $data['documentos_sustento'] ?? [];
+            unset($data['documentos_sustento']);
 
-        $envio->pago()->create([
-            'monto' => $data['fleteAPagar'],
-        ]);
+            $envio = Envio::create($data);
 
-        $envio->seguimiento()->create([
-            'estado' => 'registrado',
-            'descripcion' => 'El envío ha sido registrado.',
-            'usuario_id' => Auth::id(),
-        ]);
+            foreach ($items as $item) {
+                $envio->items()->create($item);
+            }
 
-        if ($data['recojoDomicilio']) {
-            $envio->seguimiento()->create([
-                'estado' => 'en_recojo',
-                'descripcion' => 'Recojo pendiente desde la dirección de origen.',
-                'usuario_id' => Auth::id(),
-            ]);
-        } else if ($data['agencia_origen_id']) {
-            $envio->seguimiento()->create([
-                'estado' => 'origen',
-                'descripcion' => 'El envío está en la agencia de origen.',
-                'usuario_id' => Auth::id(),
-            ]);
-        }
+            $this->guiaRemisionTransportistaService->createFromEnvio($envio, $documentosSustento);
 
-        $this->generarPdfEnvio($envio);
-
-        return $envio;
+            return $this->find($envio->id);
+        });
     }
 
-    public function update(Envio $envio, array $data): Envio
+    public function update(int $id, array $data): Envio
     {
-        $data['user_id'] = Auth::id();
-        $envio->update($data);
-        return $envio;
+        return DB::transaction(function () use ($id, $data) {
+            $envio = Envio::findOrFail($id);
+
+            $items = $data['items'] ?? [];
+            unset($data['items']);
+
+            $envio->update($data);
+
+            $envio->items()->delete();
+            foreach ($items as $item) {
+                $envio->items()->create($item);
+            }
+
+            return $this->find($envio->id);
+        });
     }
 
-    public function delete(Envio $envio): bool
+    /**
+     * Eliminar un envío (con ítems por cascada).
+     */
+    public function delete(int $id): void
     {
-        return $envio->delete();
-    }
-
-    public function findByCodigo(string $codigo): ?Envio
-    {
-        return Envio::where('codigo', $codigo)->first();
-    }
-
-    public function registrarFlujoInicial(Envio $envio, $requiereRecogido): void
-    {
-        $seguimientoService = app(SeguimientoEnvioService::class);
-
-        $seguimientoService->registrar($envio, 'registrado', 'El envío ha sido registrado.', Auth::id());
-
-        if ($requiereRecogido) {
-            $seguimientoService->registrar($envio, 'en_recojo', 'Recojo pendiente desde la dirección de origen.', Auth::id());
-        }
-    }
-
-
-    // Cancelar Envío
-    public function cancelar(Envio $envio): Envio
-    {
-        $envio->seguimiento()->create([
-            'estado' => 'cancelado',
-            'descripcion' => 'El envío ha sido cancelado por el usuario ' . Auth::user()->name . '.',
-            'usuario_id' => Auth::id(),
-        ]);
-
-        $envio->pago()->update([
-            'estado' => 'cancelado',
-            'monto' => 0,
-            'observaciones' => 'El envío ha sido cancelado el día ' . now()->format('d/m/Y H:i:s') . '.',
-        ]);
-
-        return $envio;
-    }
-
-
-    public function asignarViaje(Envio $envio, int $viajeId): Envio
-    {
-        $envio->update(['viaje_id' => $viajeId]);
-
-        $envio->seguimiento()->create([
-            'estado' => 'asignado',
-            'descripcion' => 'El envío ha sido asignado al viaje #' . $viajeId,
-            'usuario_id' => Auth::id(),
-        ]);
-
-        return $envio;
-    }
-
-    public function desasignarViaje(Envio $envio): Envio
-    {
-        $viajeAnterior = $envio->viaje_id;
-
-        $envio->update(['viaje_id' => null]);
-
-        $envio->seguimiento()->create([
-            'estado' => 'desasignado',
-            'descripcion' => 'El envío fue removido del viaje #' . $viajeAnterior,
-            'usuario_id' => Auth::id(),
-        ]);
-
-        return $envio;
-    }
-
-    public function asignarMultiplesAlViaje(array $enviosIds, int $viajeId): void
-    {
-        foreach ($enviosIds as $id) {
-            $envio = Envio::where('id', $id)->whereNull('viaje_id')->first();
-            if ($envio) $this->asignarViaje($envio, $viajeId);
-        }
-    }
-
-    public function desasignarMultiplesDelViaje(array $enviosIds, int $viajeId): void
-    {
-        foreach ($enviosIds as $id) {
-            $envio = Envio::where('id', $id)->where('viaje_id', $viajeId)->first();
-            if ($envio) $this->desasignarViaje($envio);
-        }
-    }
-
-    // trackingEnvio
-
-    public function trackingEnvio(string $codigo): ?Envio
-    {
-        return Envio::with([
-            'seguimiento' => function ($query) {
-                $query->orderBy('created_at', 'desc');
-            },
-            'remitente',
-            'destinatario',
-            'terceroPagador',
-            'agenciaOrigen',
-            'agenciaDestino',
-            'pago',
-        ])->where('codigo', $codigo)->first();
-    }
-
-    public function ticket(Envio $envio) {}
-
-
-    public function generarPdfEnvio(Envio $envio): void
-    {
-        $envio->load([
-            'user',
-            'remitente',
-            'destinatario',
-            'pagador',
-            'agenciaOrigen',
-            'agenciaDestino',
-            'pago',
-        ]);
-
-        $pdfA4 = Pdf::loadView('pdf.envio.a4', compact('envio'))->output();
-        $pdf80 = Pdf::loadView('pdf.envio.ticket-80', compact('envio'))->setPaper([0, 0, 226.77, 600])->output();
-        $pdf58 = Pdf::loadView('pdf.envio.ticket-58', compact('envio'))->setPaper([0, 0, 164.4, 600])->output();
-
-        $a4Path = "envios/envio_{$envio->numeroOrden}_a4.pdf";
-        $ticket80Path = "envios/envio_{$envio->numeroOrden}_ticket80.pdf";
-        $ticket58Path = "envios/envio_{$envio->numeroOrden}_ticket58.pdf";
-
-        Storage::disk('public')->makeDirectory('envios', 0755, true, true);
-
-        Storage::disk('public')->put($a4Path, $pdfA4);
-        Storage::disk('public')->put($ticket80Path, $pdf80);
-        Storage::disk('public')->put($ticket58Path, $pdf58);
-
-        $envio->update([
-            'pdf_path_a4' => $a4Path,
-            'pdf_path_ticket_80' => $ticket80Path,
-            'pdf_path_ticket_58' => $ticket58Path,
-        ]);
+        DB::transaction(function () use ($id) {
+            $envio = Envio::findOrFail($id);
+            $envio->delete();
+        });
     }
 }

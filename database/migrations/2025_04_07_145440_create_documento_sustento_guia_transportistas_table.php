@@ -16,16 +16,16 @@ return new class extends Migration
 
             $table->unsignedBigInteger('guia_remision_transportistas_id');
 
-            $table->foreign('guia_remision_transportistas_id', 'fk_doc_sustento_guia_remision')
+            $table->foreign('guia_remision_transportistas_id', 'fk_guia_transportista')
                 ->references('id')
                 ->on('guia_remision_transportistas')
                 ->onDelete('cascade');
 
+            $table->string('tipo_documento', 2);
 
-
-            $table->string('tipo_documento');
             $table->string('serie_numero');
-            $table->string('ruc_emisor');
+
+            $table->string('ruc_emisor', 11);
 
             $table->timestamps();
         });

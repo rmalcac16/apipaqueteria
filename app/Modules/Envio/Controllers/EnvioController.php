@@ -3,75 +3,74 @@
 namespace Modules\Envio\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Envio;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Modules\Envio\Services\EnvioService;
 use Modules\Envio\Requests\StoreEnvioRequest;
 use Modules\Envio\Requests\UpdateEnvioRequest;
-use Modules\Envio\Services\EnvioService;
-
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
 
 class EnvioController extends Controller
 {
-    public function __construct(protected EnvioService $service) {}
+    protected EnvioService $envioService;
 
-    public function index(Request $request): JsonResponse
+    public function __construct(EnvioService $envioService)
     {
-        return response()->json($this->service->all($request));
+        $this->envioService = $envioService;
     }
 
-    public function show($id): JsonResponse
+    public function index(): JsonResponse
     {
-        return response()->json($this->service->find($id));
+        return response()->json($this->envioService->getAll());
     }
 
     public function store(StoreEnvioRequest $request): JsonResponse
     {
-        $envio = $this->service->create($request->validated());
-
-        return response()->json($envio, 201);
+        return response()->json($this->envioService->create($request->validated()), 201);
     }
 
-    public function update(UpdateEnvioRequest $request, Envio $envio): JsonResponse
+    public function show(int $id): JsonResponse
     {
-
-        $updated = $this->service->update($envio, $request->validated());
-        return response()->json($updated);
+        return response()->json($this->envioService->find($id));
     }
 
-    public function destroy(Envio $envio): JsonResponse
+    public function update(UpdateEnvioRequest $request, int $id): JsonResponse
     {
-        $this->service->delete($envio);
-        return response()->json(['message' => 'Envío eliminado']);
+        return response()->json($this->envioService->update($id, $request->validated()));
     }
 
-
-    public function findByCodigo(Request $request): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $envio = $this->service->findByCodigo($request->codigo);
-        if (!$envio) {
-            return response()->json(['message' => 'Envío no encontrado'], 404);
-        }
-        return response()->json($envio);
+        $this->envioService->delete($id);
+        return response()->json(null, 204);
     }
 
 
-    // Cancelar Envío
-
-    public function cancelar(Envio $envio): JsonResponse
+    public function verPdfA4(int $id): Response
     {
-        $this->service->cancelar($envio);
-        return response()->json(['message' => 'Envío cancelado']);
+        $envio = $this->envioService->find($id);
+
+        $pdf = Pdf::loadView('pdf.envio.a4', compact('envio'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->stream("envio-{$envio->codigo}-A4.pdf");
     }
-
-
-    public function trackingEnvio(Request $request): JsonResponse
+    public function verTicket80(int $id): Response
     {
-        $envio = $this->service->trackingEnvio($request->codigo);
-        if (!$envio) {
-            return response()->json(['message' => 'Envío no encontrado'], 404);
-        }
-        return response()->json($envio);
+        $envio = $this->envioService->find($id);
+
+        $pdf = Pdf::loadView('pdf.envio.ticket_80', compact('envio'))
+            ->setPaper([0, 0, 226.77, 600], 'portrait');
+
+        return $pdf->stream("envio-{$envio->codigo}-ticket80.pdf");
+    }
+    public function verTicket58(int $id): Response
+    {
+        $envio = $this->envioService->find($id);
+
+        $pdf = Pdf::loadView('pdf.envio.ticket_58', compact('envio'))
+            ->setPaper([0, 0, 164.41, 600], 'portrait');
+
+        return $pdf->stream("envio-{$envio->codigo}-ticket58.pdf");
     }
 }

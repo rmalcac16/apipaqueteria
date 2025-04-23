@@ -39,6 +39,11 @@ return new class extends Migration
                 ->constrained('clientes')
                 ->nullOnDelete();
 
+            $table->foreignId('viaje_id')
+                ->nullable()
+                ->constrained('viajes')
+                ->nullOnDelete();
+
             $table->foreignId('agencia_origen_id')
                 ->constrained('agencias')
                 ->onDelete('cascade');

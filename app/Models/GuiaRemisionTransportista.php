@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GuiaRemisionTransportista extends Model
 {
@@ -10,60 +11,56 @@ class GuiaRemisionTransportista extends Model
 
     protected $fillable = [
         'envio_id',
-        'conductor_nombre',
-        'conductor_tipo_documento',
-        'conductor_documento',
-        'conductor_licencia',
-        'vehiculo_placa',
-        'vehiculo_tuc',
-        'vehiculo_certificado',
+        'viaje_id',
+        'codigo',
+        'serie',
+        'numero',
+        'fecha_emision',
         'fecha_inicio_traslado',
-        'modo_transporte',
-        'punto_partida_ubigeo',
-        'punto_partida_direccion',
-        'punto_llegada_ubigeo',
-        'punto_llegada_direccion',
-        'descripcion_carga',
-        'peso_total',
-        'unidad_medida',
-        'remitente_nombre',
-        'remitente_documento',
-        'destinatario_nombre',
-        'destinatario_documento',
-        'pagador_tipo',
-        'pagador_tipo_documento',
-        'pagador_numero_documento',
-        'pagador_nombre_razon_social',
         'estado',
-        'pdf_path',
+        'estado_sunat',
+        'pdf_path_a4',
+        'pdf_path_ticket_80',
+        'pdf_path_ticket_58',
+        'xml_path',
+        'cdr_path',
+        'hash',
+        'user_id',
     ];
 
+    protected $casts = [
+        'fecha_emision' => 'datetime',
+        'fecha_inicio_traslado' => 'date',
+    ];
 
-    protected static function booted()
-    {
-        static::creating(function ($guia) {
-            $envio = $guia->envio()->with('agencia')->first();
-            $codigoAgencia = $envio->agencia->codigo; // Asegúrate que sea tipo '001'
-
-            $ultimo = self::whereHas('envio', function ($q) use ($codigoAgencia) {
-                $q->whereHas('agencia', function ($a) use ($codigoAgencia) {
-                    $a->where('codigo', $codigoAgencia);
-                });
-            })->orderByDesc('id')->first();
-
-            $correlativo = 1;
-            if ($ultimo && preg_match('/^V\d{3}-(\d{6})$/', $ultimo->numero_documento, $match)) {
-                $correlativo = (int) $match[1] + 1;
-            }
-
-            $guia->numero_documento = 'V' . str_pad($codigoAgencia, 3, '0', STR_PAD_LEFT) . '-' . str_pad($correlativo, 6, '0', STR_PAD_LEFT);
-        });
-    }
-
-
-    public function envio()
+    // 📦 Relación con el envío
+    public function envio(): BelongsTo
     {
         return $this->belongsTo(Envio::class);
+    }
+
+    // 🚚 Relación con el viaje (opcional)
+    public function viaje(): BelongsTo
+    {
+        return $this->belongsTo(Viaje::class);
+    }
+
+    // 👤 Usuario que generó la guía
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // 🔍 Scope por estado interno
+    public function scopeEstado($query, string $estado)
+    {
+        return $query->where('estado', $estado);
+    }
+
+    // 🔍 Scope por estado SUNAT
+    public function scopeEstadoSunat($query, string $estadoSunat)
+    {
+        return $query->where('estado_sunat', $estadoSunat);
     }
 
     public function documentosSustento()
