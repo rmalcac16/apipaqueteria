@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Pago\Services;
+namespace Modules\PagoEnvio\Services;
 
 use App\Models\PagoEnvio;
 use Illuminate\Support\Facades\Auth;

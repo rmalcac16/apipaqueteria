@@ -21,10 +21,13 @@ return new class extends Migration {
 
             $table->enum('estado', ['generado', 'enviado', 'anulado'])->default('generado');
             $table->enum('estado_sunat', ['pendiente', 'aceptado', 'rechazado', 'observado'])->default('pendiente');
+            $table->string('codigo_sunat')->nullable();
+            $table->string('descripcion_sunat')->nullable();
 
             $table->string('xml_path')->nullable();
             $table->string('cdr_path')->nullable();
             $table->string('pdf_path')->nullable();
+            $table->string('hash_code')->nullable();
 
             $table->dateTime('fecha_emision')->default(now());
 

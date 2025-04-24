@@ -13,8 +13,8 @@ class ClienteSeeder extends Seeder
 
         DB::table('clientes')->insert([
             [
-                'tipoDocumento'    => 'B',
-                'numeroDocumento'  => '999000111',
+                'tipoDocumento'    => '1',
+                'numeroDocumento'  => '12345678',
                 'nombreCompleto'   => 'Andrés Ramírez',
                 'direccion'        => 'Mz. H Lt. 10, Urb. Sol de Oro',
                 'telefono'         => '+51 912345678',
@@ -23,7 +23,7 @@ class ClienteSeeder extends Seeder
                 'observaciones'    => 'Solicitó información sobre promociones',
             ],
             [
-                'tipoDocumento'    => 'F',
+                'tipoDocumento'    => '6',
                 'numeroDocumento'  => '20600533445',
                 'nombreCompleto'   => 'Corporación Soluciones SAC',
                 'direccion'        => 'Av. La Marina 1234, San Miguel',
@@ -33,8 +33,8 @@ class ClienteSeeder extends Seeder
                 'observaciones'    => 'Cliente frecuente con crédito mensual',
             ],
             [
-                'tipoDocumento'    => 'B',
-                'numeroDocumento'  => '998877665',
+                'tipoDocumento'    => '1',
+                'numeroDocumento'  => '45678912',
                 'nombreCompleto'   => 'Rocío Luján',
                 'direccion'        => 'Jr. Amazonas 456, Trujillo',
                 'telefono'         => '+51 914567890',
@@ -43,7 +43,7 @@ class ClienteSeeder extends Seeder
                 'observaciones'    => 'Solicita recojo a domicilio',
             ],
             [
-                'tipoDocumento'    => 'F',
+                'tipoDocumento'    => '6',
                 'numeroDocumento'  => '20111222334',
                 'nombreCompleto'   => 'Inversiones Andinas EIRL',
                 'direccion'        => 'Parque Industrial N° 30, Arequipa',
@@ -53,8 +53,8 @@ class ClienteSeeder extends Seeder
                 'observaciones'    => 'Primer contacto vía web',
             ],
             [
-                'tipoDocumento'    => 'B',
-                'numeroDocumento'  => '977665544',
+                'tipoDocumento'    => '1',
+                'numeroDocumento'  => '65874589',
                 'nombreCompleto'   => 'Luis Moreno',
                 'direccion'        => 'Av. Grau 789, Piura',
                 'telefono'         => '+51 916666999',

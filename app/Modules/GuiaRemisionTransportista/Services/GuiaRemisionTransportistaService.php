@@ -7,6 +7,10 @@ use App\Models\Envio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
+use Modules\GuiaRemisionSunat\Services\SunatGuiaRemisionService;
+use Luecano\NumeroALetras\NumeroALetras;
+use Throwable;
 
 class GuiaRemisionTransportistaService
 {
@@ -60,13 +64,13 @@ class GuiaRemisionTransportistaService
     public function createFromEnvio(Envio $envio, array $documentosSustento = []): GuiaRemisionTransportista
     {
         return DB::transaction(function () use ($envio, $documentosSustento) {
-            $serie = 'V001';
+            $serie = env('SERIE_GUIA_TRANSPORTISTA', 'V101');
             $ultimoNumero = GuiaRemisionTransportista::where('serie', $serie)->max('numero') ?? 0;
             $nuevoNumero = $ultimoNumero + 1;
 
             $guia = GuiaRemisionTransportista::create([
                 'envio_id'              => $envio->id,
-                'viaje_id'              => null,
+                'viaje_id'              => $envio->viaje_id,
                 'codigo'                => $serie . '-' . str_pad($nuevoNumero, 6, '0', STR_PAD_LEFT),
                 'serie'                 => $serie,
                 'numero'                => $nuevoNumero,
@@ -85,7 +89,15 @@ class GuiaRemisionTransportistaService
                 ]);
             }
 
-            return $guia;
+            return tap($this->find($guia->id), function ($guia) {
+                if (env('GUIA_REMISION_SUNAT_AUTO', false)) {
+                    try {
+                        $this->enviarSunat($guia);
+                    } catch (Throwable $e) {
+                        Log::error('Error al enviar la guia de remisión a SUNAT: ' . $e->getMessage());
+                    }
+                }
+            });
         });
     }
 
@@ -110,5 +122,91 @@ class GuiaRemisionTransportistaService
             $guia = GuiaRemisionTransportista::findOrFail($id);
             $guia->delete();
         });
+    }
+
+
+    public function enviarSunat(GuiaRemisionTransportista $guia_remision_transportista): array
+    {
+
+        $envio = $guia_remision_transportista->envio;
+        $conductor = $guia_remision_transportista->viaje->conductorPrincipal;
+        $vehiculo = $guia_remision_transportista->viaje->vehiculoPrincipal;
+        $nombreSeparado = $this->separarNombresApellidos($conductor->nombreCompleto);
+
+        $items = [];
+        foreach ($envio->items as $item) {
+            $items[] = [
+                'codigo' => $item->codigo,
+                'descripcion' => $item->descripcion,
+                'unidad' => $item->unidad_medida,
+                'cantidad' => $item->cantidad,
+            ];
+        }
+
+
+        $data = [
+            'serie' => $guia_remision_transportista->serie ?? getSetting('SERIE_GUIA_TRANSPORTISTA'),
+            'correlativo' => $guia_remision_transportista->numero ?? '00000001',
+            'empresa' => [
+                'ruc' => getSetting('BUSINESS_RUC'),
+                'razon_social' => getSetting('BUSINESS_NAME'),
+                'nro_mtc' => getSetting('BUSINESS_MTC') ?? '0000000001'
+            ],
+            'destinatario' => [
+                'tipo_doc' => $envio->destinatario->tipoDocumento,
+                'numero_doc' => $envio->destinatario->numeroDocumento,
+                'razon_social' => $envio->destinatario->nombreCompleto,
+            ],
+            'remitente' => [
+                'tipo_doc' => $envio->remitente->tipoDocumento,
+                'numero_doc' => $envio->remitente->numeroDocumento,
+                'razon_social' => $envio->remitente->nombreCompleto,
+            ],
+            'vehiculo' => [
+                'placa' => $vehiculo->placa,
+            ],
+            'chofer' => [
+                'dni' => $conductor->numeroDocumento,
+                'licencia' => $conductor->numeroLicencia,
+                'nombres' => $nombreSeparado['nombres'],
+                'apellidos' => $nombreSeparado['apellidos'],
+            ],
+            'envio' => [
+                'fecha_traslado' => $envio->fechaTraslado ?? now()->toDateTimeString(),
+                'peso_total' => $envio->pesoTotal ?? 1,
+                'unidad_medida' => $envio->unidadMedida ?? 'KGM',
+                'ubigeo_origen' => $envio->recojoDomicilio ? $envio->recojo_ubigeo : $envio->agenciaOrigen->ubigeo,
+                'direccion_origen' => $envio->recojoDomicilio ? $envio->recojo_direccion : $envio->agenciaOrigen->direccion,
+                'ubigeo_destino' => $envio->entregaDomicilio ? $envio->entrega_ubigeo : $envio->agenciaDestino->ubigeo,
+                'direccion_destino' => $envio->entregaDomicilio ? $envio->entrega_direccion : $envio->agenciaDestino->direccion,
+            ],
+            'items' => $items
+        ];
+
+        $service = new SunatGuiaRemisionService();
+        return $service->emitirGuia($data, $guia_remision_transportista);
+    }
+
+
+    private function separarNombresApellidos(string $nombreCompleto): array
+    {
+        $partes = explode(' ', trim($nombreCompleto));
+        $total = count($partes);
+
+        if ($total >= 3) {
+            $apellidos = $partes[$total - 2] . ' ' . $partes[$total - 1];
+            $nombres = implode(' ', array_slice($partes, 0, $total - 2));
+        } elseif ($total === 2) {
+            $nombres = $partes[0];
+            $apellidos = $partes[1];
+        } else {
+            $nombres = $nombreCompleto;
+            $apellidos = '';
+        }
+
+        return [
+            'nombres' => $nombres,
+            'apellidos' => $apellidos,
+        ];
     }
 }

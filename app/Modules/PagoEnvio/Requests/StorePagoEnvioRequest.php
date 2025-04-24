@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Pago\Requests;
+namespace Modules\PagoEnvio\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

@@ -56,8 +56,8 @@ class UsuarioSeeder extends Seeder
             [
                 'name'              => 'LuisR',
                 'nombreCompleto'    => 'Luis Ramírez',
-                'numeroDocumento'   => '44556677',
-                'numeroLicencia'    => 'LIC-987654',
+                'numeroDocumento'   => '44004400',
+                'numeroLicencia'    => '0001122020',
                 'email'             => 'luis.ramirez@example.com',
                 'telefono'          => '987777888',
                 'rol'               => 'conductor',
@@ -68,8 +68,8 @@ class UsuarioSeeder extends Seeder
             [
                 'name'              => 'SoniaT',
                 'nombreCompleto'    => 'Sonia Torres',
-                'numeroDocumento'   => '99887766',
-                'numeroLicencia'    => 'LIC-123321',
+                'numeroDocumento'   => '55005500',
+                'numeroLicencia'    => '0002233030',
                 'email'             => 'sonia.torres@example.com',
                 'telefono'          => '987999000',
                 'rol'               => 'conductor',

@@ -13,9 +13,9 @@ return new class extends Migration {
             $table->foreignId('envio_id')->unique()->constrained('envios')->onDelete('cascade');
             $table->foreignId('viaje_id')->nullable()->constrained('viajes')->nullOnDelete();
 
-            $table->string('codigo')->unique();         // Ej: T001-000123
-            $table->string('serie')->nullable();        // Ej: T001
-            $table->integer('numero')->nullable();      // Ej: 123
+            $table->string('codigo')->unique();
+            $table->string('serie')->nullable();
+            $table->integer('numero')->nullable();
 
             $table->dateTime('fecha_emision')->default(now());
             $table->date('fecha_inicio_traslado')->default(now());
@@ -29,12 +29,10 @@ return new class extends Migration {
                 'anulada'
             ])->default('generada');
 
-            $table->enum('estado_sunat', [
-                'pendiente',
-                'enviada',
-                'rechazada',
-                'anulada'
-            ])->default('pendiente');
+            $table->enum('estado_sunat', ['pendiente', 'aceptado', 'rechazado', 'observado'])->default('pendiente');
+            $table->string('codigo_sunat')->nullable();
+            $table->string('descripcion_sunat')->nullable();
+
 
             // Archivos PDF generados
             $table->string('pdf_path_a4')->nullable();
@@ -44,7 +42,8 @@ return new class extends Migration {
             // Archivos SUNAT
             $table->string('xml_path')->nullable();
             $table->string('cdr_path')->nullable();
-            $table->string('hash')->nullable();
+            $table->string('hash_code')->nullable();
+            $table->string('ticket')->nullable();
 
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 

@@ -106,11 +106,15 @@ Route::prefix('guias-remision-transportista/{GuiaRemisionTransportista}')->group
     Route::get('pdf-a4', [GuiaRemisionTransportistaController::class, 'verPdfA4']);
     Route::get('ticket-80', [GuiaRemisionTransportistaController::class, 'verTicket80']);
     Route::get('ticket-58', [GuiaRemisionTransportistaController::class, 'verTicket58']);
+
+    Route::get('enviarSunat', [GuiaRemisionTransportistaController::class, 'enviarSunat']);
 });
 
 
-Route::prefix('comprobantes/{Comprobante}')->group(function () {
+Route::prefix('comprobantes/{comprobante}')->group(function () {
     Route::get('pdf-a4', [ComprobanteController::class, 'verPdfA4']);
     Route::get('ticket-80', [ComprobanteController::class, 'verTicket80']);
     Route::get('ticket-58', [ComprobanteController::class, 'verTicket58']);
+
+    Route::get('enviarSunat', [ComprobanteController::class, 'enviarSunat']);
 });

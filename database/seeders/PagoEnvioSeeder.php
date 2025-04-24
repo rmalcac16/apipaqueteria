@@ -13,8 +13,10 @@ class PagoEnvioSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::first(); // cualquier usuario válido
-        $cliente = Cliente::first();
+        $user = User::first();
+        $clienteBoleta = Cliente::where('tipoDocumento', "1")->first();
+        $clienteFactura = Cliente::where('tipoDocumento', "6")->first();
+
         $agencia = Agencia::first();
 
         $comprobanteService = app(ComprobanteService::class);
@@ -28,7 +30,7 @@ class PagoEnvioSeeder extends Seeder
             'medio_pago'         => 'yape',
             'numero_transaccion' => 'YAPE001',
             'fecha_pago'         => now(),
-            'realizado_por'      => $cliente->id,
+            'realizado_por'      => $clienteBoleta->id,
             'cobrado_por'        => $user->id,
             'agencia_id'         => $agencia->id,
             'observaciones'      => 'Pago contado de envío 1',
@@ -48,7 +50,7 @@ class PagoEnvioSeeder extends Seeder
             'medio_pago'         => 'bcp',
             'numero_transaccion' => 'BCP2024',
             'fecha_pago'         => now(),
-            'realizado_por'      => $cliente->id,
+            'realizado_por'      => $clienteFactura->id,
             'cobrado_por'        => $user->id,
             'agencia_id'         => $agencia->id,
             'observaciones'      => 'Pago crédito de envío 2',

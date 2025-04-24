@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Comprobantes\Requests;
+namespace Modules\Comprobante\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

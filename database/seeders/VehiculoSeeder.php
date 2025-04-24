@@ -3,21 +3,18 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
 use App\Models\Vehiculo;
 
 class VehiculoSeeder extends Seeder
 {
     public function run(): void
     {
-
         // Tractocamiones
         foreach (range(1, 5) as $i) {
             Vehiculo::create([
                 'tipo'         => 'tractocamion',
-                'placa'        => "TRC-10{$i}{$i}",
-                'tuc'          => "TUC-TRC-00{$i}",
+                'placa'        => 'TRC' . $this->generateAlphanumeric(3 + $i % 2), // Total de 6 a 8 caracteres
+                'tuc'          => "TUCTRC{$i}",
                 'marca'        => 'Volvo',
                 'modelo'       => 'FH16',
                 'anio'         => 2018 + $i,
@@ -32,8 +29,8 @@ class VehiculoSeeder extends Seeder
         foreach (range(1, 5) as $i) {
             Vehiculo::create([
                 'tipo'         => 'semirremolque',
-                'placa'        => "SMR-20{$i}{$i}",
-                'tuc'          => "TUC-SMR-00{$i}",
+                'placa'        => 'SMR' . $this->generateAlphanumeric(3 + $i % 2), // Total de 6 a 8 caracteres
+                'tuc'          => "TUC-SMR{$i}",
                 'marca'        => 'Randon',
                 'modelo'       => 'SR45',
                 'anio'         => 2016 + $i,
@@ -43,5 +40,15 @@ class VehiculoSeeder extends Seeder
                 'acopladoA_id' => null,
             ]);
         }
+    }
+
+    private function generateAlphanumeric($length = 6): string
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $result = '';
+        for ($i = 0; $i < $length; $i++) {
+            $result .= $characters[random_int(0, strlen($characters) - 1)];
+        }
+        return $result;
     }
 }

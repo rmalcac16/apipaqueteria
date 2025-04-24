@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Luecano\NumeroALetras\NumeroALetras;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Comprobante extends Model
 {
@@ -15,12 +17,21 @@ class Comprobante extends Model
         'monto_total',
         'estado',
         'estado_sunat',
+        'codigo_sunat',
+        'descripcion_sunat',
         'xml_path',
         'cdr_path',
         'pdf_path',
         'fecha_emision',
         'cliente_id',
+        'hash_code'
     ];
+
+
+    protected $casts = [
+        'fecha_emision' => 'datetime',
+    ];
+
 
     public function pago()
     {
@@ -35,5 +46,30 @@ class Comprobante extends Model
     public function cuotas()
     {
         return $this->hasMany(CuotaComprobante::class);
+    }
+
+    public function getQrTextAttribute(): string
+    {
+        return implode('|', [
+            env('BUSINESS_RUC'),
+            $this->tipo,
+            $this->serie,
+            $this->numero,
+            number_format(($this->monto_total * 0.18), 2, '.', ''),
+            number_format($this->monto_total, 2, '.', ''),
+            \Carbon\Carbon::parse($this->fecha_emision)->format('Y-m-d'),
+            $this->cliente->tipoDocumento ?? '',
+            $this->cliente->numeroDocumento ?? '',
+            $this->hash_code ?? '',
+        ]);
+    }
+
+
+    // Monto Total a letras
+
+    public function getMontoTotalLetrasAttribute(): string
+    {
+        $formatter = new NumeroALetras();
+        return $formatter->toMoney($this->monto_total, 2, 'SOLES', 'CENTIMOS');
     }
 }

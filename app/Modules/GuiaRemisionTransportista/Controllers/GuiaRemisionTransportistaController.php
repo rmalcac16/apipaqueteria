@@ -38,4 +38,10 @@ class GuiaRemisionTransportistaController extends Controller
             ->setPaper([0, 0, 164.41, 700], 'portrait');
         return $pdf->stream("guia-{$guia->codigo}-ticket58.pdf");
     }
+
+    public function enviarSunat(int $id)
+    {
+        $comprobante = $this->service->find($id);
+        return $this->service->enviarSunat($comprobante);
+    }
 }

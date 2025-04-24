@@ -19,12 +19,15 @@ class GuiaRemisionTransportista extends Model
         'fecha_inicio_traslado',
         'estado',
         'estado_sunat',
+        'codigo_sunat',
+        'descripcion_sunat',
         'pdf_path_a4',
         'pdf_path_ticket_80',
         'pdf_path_ticket_58',
         'xml_path',
         'cdr_path',
-        'hash',
+        'hash_code',
+        'ticket',
         'user_id',
     ];
 
@@ -66,5 +69,13 @@ class GuiaRemisionTransportista extends Model
     public function documentosSustento()
     {
         return $this->hasMany(DocumentoSustentoGuiaTransportista::class, 'guia_remision_transportistas_id');
+    }
+
+
+    // URL para descargar la guia desde SUNAT
+
+    public function getQrTextAttribute()
+    {
+        return "https://e-factura.sunat.gob.pe/v1/contribuyente/gre/comprobantes/descargaqr?hashqr={$this->hash_code}";
     }
 }
