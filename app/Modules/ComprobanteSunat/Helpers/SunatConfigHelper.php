@@ -18,9 +18,9 @@ class SunatConfigHelper
         $see->setService(SunatEndpoints::FE_BETA); // o SunatEndpoints::FE_PRODUCCION
 
         $see->setClaveSOL(
-            env('SUNAT_RUC', '20000000001'),
-            env('SUNAT_USUARIO', 'MODDATOS'),
-            env('SUNAT_CLAVE', 'moddatos')
+            getSetting('SUNAT_FACTURACION_RUC', '20000000001'),
+            getSetting('SUNAT_FACTURACION_USUARIO', 'MODDATOS'),
+            getSetting('SUNAT_FACTURACION_CLAVE', 'moddatos')
         );
 
         return $see;

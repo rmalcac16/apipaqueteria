@@ -33,9 +33,9 @@ class SettingsTableSeeder extends Seeder
             'BUSINESS_MTC' => '0000000001',
 
             // SUNAT FACTURACION
-            'SUNAT_RUC' => '20123456789',
-            'SUNAT_USUARIO' => 'MODDATOS',
-            'SUNAT_CLAVE' => 'moddatos',
+            'SUNAT_FACTURACION_RUC' => '20123456789',
+            'SUNAT_FACTURACION_USUARIO' => 'MODDATOS',
+            'SUNAT_FACTURACION_CLAVE' => 'moddatos',
 
             // SUNAT GUIA DE REMISION
             'SUNAT_GUIA_AUTH_URL' => 'https://gre-test.nubefact.com/v1',

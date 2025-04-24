@@ -90,7 +90,7 @@ class GuiaRemisionTransportistaService
             }
 
             return tap($this->find($guia->id), function ($guia) {
-                if (env('GUIA_REMISION_SUNAT_AUTO', false)) {
+                if (getSetting('GUIA_REMISION_SUNAT_AUTO', false)) {
                     try {
                         $this->enviarSunat($guia);
                     } catch (Throwable $e) {
@@ -142,7 +142,6 @@ class GuiaRemisionTransportistaService
                 'cantidad' => $item->cantidad,
             ];
         }
-
 
         $data = [
             'serie' => $guia_remision_transportista->serie ?? getSetting('SERIE_GUIA_TRANSPORTISTA'),
