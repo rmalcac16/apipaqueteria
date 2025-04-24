@@ -37,4 +37,16 @@ class SunatGuiaConfigHelper
             )
             ->setCertificate($certificate);
     }
+
+    public static function signXml(string $xml): string
+    {
+        $api = self::getSeeApi();
+
+        $ref = new \ReflectionObject($api);
+        $signerProp = $ref->getProperty('signer');
+        $signerProp->setAccessible(true);
+        $signer = $signerProp->getValue($api);
+
+        return $signer->signXml($xml);
+    }
 }

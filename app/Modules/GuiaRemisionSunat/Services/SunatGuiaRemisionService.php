@@ -6,7 +6,6 @@ use DateTime;
 use DOMDocument;
 use DOMXPath;
 use Greenter\Model\Client\Client;
-use Greenter\Model\Company\Address;
 use Greenter\Model\Company\Company;
 use Greenter\Model\Despatch\Despatch;
 use Greenter\Model\Despatch\DespatchDetail;
@@ -15,7 +14,10 @@ use Greenter\Model\Despatch\Driver;
 use Greenter\Model\Despatch\Shipment;
 use Greenter\Model\Despatch\Transportist;
 use Greenter\Model\Despatch\Vehicle;
+use Greenter\Model\DocumentInterface;
+use Greenter\XMLSecLibs\Sunat\SignedXml;
 use Modules\GuiaRemisionSunat\Helpers\SunatGuiaConfigHelper;
+use Twig\Environment;
 
 class SunatGuiaRemisionService
 {
@@ -97,11 +99,17 @@ class SunatGuiaRemisionService
         $despatch->setDetails($items);
 
 
+        $twig = app(Environment::class);
+        $xmlCustom = $twig->render('despatch2022', [
+            'doc' => $despatch,
+        ]);
+
         // ENVÍO A SUNAT
         $api = SunatGuiaConfigHelper::getSeeApi();
 
+        $xmlFirmado = SunatGuiaConfigHelper::signXml($xmlCustom);
 
-        $res = $api->send($despatch);
+        $res = $api->sendXml($despatch->getName() . '.xml', $xmlFirmado);
 
         $name = $despatch->getName();
 
@@ -112,9 +120,7 @@ class SunatGuiaRemisionService
             mkdir(storage_path('sunat/guias_remision/xml'), 0755, true);
         }
 
-        $xmlContent = $api->getLastXml();
-
-        file_put_contents(storage_path($xmlPath), $xmlContent);
+        file_put_contents(storage_path($xmlPath), $xmlFirmado);
 
         if (!$res->isSuccess()) {
             return [
@@ -147,7 +153,7 @@ class SunatGuiaRemisionService
 
         // Extraer hash del XML firmado
         $dom = new DOMDocument();
-        $dom->loadXML($xmlContent);
+        $dom->loadXML($xmlFirmado);
         $xpath = new DOMXPath($dom);
         $xpath->registerNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
         $hashNode = $xpath->query('//ds:DigestValue')->item(0);
