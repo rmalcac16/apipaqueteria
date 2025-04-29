@@ -28,10 +28,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::prefix('auth')->group(function () {
-    Route::get('login', function () {
-        return response()->json(['message' => 'Login endpoint ready.'], 200);
-    });
     Route::post('register', [AuthController::class, 'register']);
+    Route::get('login', [AuthController::class, 'login']);
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->get('me', [AuthController::class, 'me']);
     Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
