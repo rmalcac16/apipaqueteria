@@ -28,6 +28,9 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::prefix('auth')->group(function () {
+    Route::get('login', function () {
+        return response()->json(['message' => 'Login endpoint ready.'], 200);
+    });
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->get('me', [AuthController::class, 'me']);
@@ -123,4 +126,9 @@ Route::prefix('comprobantes/{comprobante}')->group(function () {
     Route::get('ticket-58', [ComprobanteController::class, 'verTicket58']);
 
     Route::get('enviarSunat', [ComprobanteController::class, 'enviarSunat']);
+});
+
+
+Route::get('/auth/login', function () {
+    return response()->json(['message' => 'Login endpoint ready.'], 200);
 });
