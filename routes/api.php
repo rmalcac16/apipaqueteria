@@ -125,8 +125,3 @@ Route::prefix('comprobantes/{comprobante}')->group(function () {
 
     Route::get('enviarSunat', [ComprobanteController::class, 'enviarSunat']);
 });
-
-
-Route::get('/auth/login', function () {
-    return response()->json(['message' => 'Login endpoint ready.'], 200);
-});
