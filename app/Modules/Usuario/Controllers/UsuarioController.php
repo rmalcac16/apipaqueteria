@@ -9,14 +9,15 @@ use Modules\Usuario\Requests\UpdateUsuarioRequest;
 use Modules\Usuario\Services\UsuarioService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Collection;
 
 class UsuarioController extends Controller
 {
     public function __construct(protected UsuarioService $service) {}
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): Collection
     {
-        return response()->json($this->service->all($request->all()));
+        return $this->service->all($request->all());
     }
 
     public function show($id): JsonResponse

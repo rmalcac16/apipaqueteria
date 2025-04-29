@@ -58,6 +58,14 @@
             font-size: 8px;
         }
 
+        .text-3xl {
+            font-size: 16px;
+        }
+
+        .text-4xl {
+            font-size: 20px;
+        }
+
         .section {
             margin-bottom: 6px;
             padding-bottom: 6px;
@@ -166,6 +174,15 @@
             border: 1px solid #000;
         }
 
+        .tipo_pago {
+            font-weight: bold;
+            text-align: center;
+            padding: 3px;
+            border: 1px solid #000;
+            width: 75%;
+            margin: 4px auto;
+        }
+
         .documentos-table {
             width: 100%;
             border-collapse: collapse;
@@ -206,9 +223,10 @@
 
     <div class="section center">
         <p class="bold uppercase">GUÍA DE REMISIÓN ELECTRÓNICA TRANSPORTISTA</p>
-        <p class="text-sm">{{ $guia->codigo }}</p>
-        <p class="text-xs">Fecha emisión: {{ $guia->fecha_emision }}</p>
+        <p class="text-4xl bold">{{ $guia->codigo }}</p>
+        <p>Fecha emisión: {{ $guia->fecha_emision }}</p>
     </div>
+
 
     <div class="section">
         <table class="two-columns">
@@ -319,18 +337,6 @@
                 </td>
             </tr>
         </table>
-        <p class="text-xs">El pagador del flete es: {{ $guia->envio->pagador->nombreCompleto }}
-            <span class="bold">
-                (@if ($guia->envio->pagador_id === $guia->envio->remitente_id)
-                    REMITENTE
-                @elseif ($guia->envio->pagador_id === $guia->envio->destinatario_id)
-                    DESTINATARIO
-                @else
-                    OTRO ({{ $guia->envio->pagador->nombreCompleto }})
-                @endif
-                )
-            </span>
-        </p>
     </div>
 
     <div class="section">

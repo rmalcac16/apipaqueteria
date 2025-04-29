@@ -23,8 +23,8 @@ return new class extends Migration {
             $table->enum('estado', ['pendiente', 'completado', 'cancelado'])->default('pendiente');
 
             // Forma y medio de pago
-            $table->enum('forma_pago', ['efectivo', 'transferencia', 'deposito'])->default('efectivo');
-            $table->enum('medio_pago', ['yape', 'plin', 'bcp', 'interbank', 'bbva', 'otros'])->nullable();
+            $table->enum('metodo_pago', ['efectivo', 'transferencia', 'deposito', 'billetera_digital', 'otros'])->default('efectivo');
+            $table->enum('medio_pago', ['bcp', 'scotiabank', 'interbank', 'bbva', 'banbif', 'yape', 'plin',  'tunki', 'agora', 'otros'])->nullable();
 
             // Transacción
             $table->string('numero_transaccion')->nullable();

@@ -10,7 +10,7 @@ class PagoEnvio extends Model
         'envio_id',
         'monto',
         'estado',
-        'forma_pago',
+        'metodo_pago',
         'medio_pago',
         'numero_transaccion',
         'fecha_pago',

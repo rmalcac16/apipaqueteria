@@ -11,9 +11,9 @@ class ViajeService
     /**
      * Obtener todos los viajes.
      */
-    public function getAll(): Collection
+    public function getAll(array $filters = []): Collection
     {
-        return Viaje::with([
+        $query = Viaje::with([
             'vehiculoPrincipal',
             'vehiculoSecundario',
             'conductorPrincipal',
@@ -21,7 +21,28 @@ class ViajeService
             'agenciaOrigen',
             'agenciaDestino',
             'creadoPor',
-        ])->get();
+        ]);
+
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if (!is_null($value)) {
+                    if ($key === 'fecha_inicio_salida') {
+                        $query->where('fecha_salida', '>=', $value);
+                    } elseif ($key === 'estado_in') {
+                        $query->whereIn('estado', $value);
+                    } elseif ($key === 'estado_not_in') {
+                        $query->whereNotIn('estado', $value);
+                    } else {
+                        $query->where($key, $value);
+                    }
+                }
+            }
+        }
+
+        // Ordenar por fecha de salida
+        $query->orderBy('fecha_salida', 'asc');
+
+        return $query->get();
     }
 
     /**

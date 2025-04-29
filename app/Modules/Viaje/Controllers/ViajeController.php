@@ -9,6 +9,7 @@ use Modules\Viaje\Requests\StoreViajeRequest;
 use Modules\Viaje\Requests\UpdateViajeRequest;
 use App\Models\Viaje;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 class ViajeController extends Controller
 {
@@ -22,9 +23,9 @@ class ViajeController extends Controller
     /**
      * Listar todos los viajes.
      */
-    public function index(): Collection
+    public function index(Request $request): Collection
     {
-        return $this->viajeService->getAll();
+        return $this->viajeService->getAll($request->all());
     }
 
     /**

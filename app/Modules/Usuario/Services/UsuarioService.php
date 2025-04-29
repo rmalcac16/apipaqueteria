@@ -5,32 +5,27 @@ namespace Modules\Usuario\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Collection;
 
 class UsuarioService
 {
-    public function all(array $filtros)
+    public function all(array $filters = []): Collection
     {
-        $query = User::query()->with('agencia');
+        $query = User::with([
+            'agencia',
+        ]);
 
-        $query->when(isset($filtros['agencia_id']), function ($query) use ($filtros) {
-            $query->where('agencia_id', $filtros['agencia_id']);
-        });
-
-        $query->when(isset($filtros['nombre']), function ($query) use ($filtros) {
-            $query->where('nombre', 'like', '%' . $filtros['nombre'] . '%');
-        });
-
-        $query->when(isset($filtros['email']), function ($query) use ($filtros) {
-            $query->where('email', 'like', '%' . $filtros['email'] . '%');
-        });
-
-
-        $query->when(isset($filtros['rol']), function ($query) use ($filtros) {
-            $query->where('rol', $filtros['rol']);
-        });
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if (!is_null($value)) {
+                    $query->where($key, $value);
+                }
+            }
+        }
 
         return $query->get();
     }
+
 
     public function find(int $id)
     {

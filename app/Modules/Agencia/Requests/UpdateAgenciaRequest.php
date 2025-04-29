@@ -26,6 +26,7 @@ class UpdateAgenciaRequest extends FormRequest
             'departamento' => 'nullable|string|max:100',
             'estado' => 'nullable|boolean',
             'googleMapsUrl' => 'nullable|string|max:255',
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
@@ -55,6 +56,10 @@ class UpdateAgenciaRequest extends FormRequest
             'estado.boolean' => 'El estado debe ser un valor booleano.',
             'googleMapsUrl.string' => 'La URL de Google Maps debe ser una cadena de texto.',
             'googleMapsUrl.max' => 'La URL de Google Maps no debe superar los 255 caracteres.',
+            'image.image' => 'El archivo debe ser una imagen.',
+            'image.mimes' => 'La imagen debe ser de tipo jpg, jpeg, png o webp.',
+            'image.max' => 'La imagen no debe superar los 2 MB.',
+
         ];
     }
 
@@ -71,6 +76,7 @@ class UpdateAgenciaRequest extends FormRequest
             'departamento' => 'Departamento de la agencia',
             'estado' => 'Estado de la agencia',
             'googleMapsUrl' => 'URL de Google Maps de la agencia',
+            'image' => 'URL de la imagen de la agencia',
         ];
     }
 }

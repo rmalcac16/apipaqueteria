@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('departamento')->nullable();
             $table->boolean('estado')->default(true);
             $table->string('googleMapsUrl')->nullable();
+            $table->string('imagenUrl')->nullable();
             $table->timestamps();
         });
     }

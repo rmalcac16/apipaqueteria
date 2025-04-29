@@ -26,6 +26,7 @@ class UpdateViajeRequest extends FormRequest
             'agencia_origen_id'       => 'required|exists:agencias,id',
             'agencia_destino_id'      => 'required|exists:agencias,id|different:agencia_origen_id',
             'fecha_salida'            => 'required|date|after_or_equal:today',
+            'fecha_llegada'          => 'nullable|date|after:fecha_salida',
             'estado'                  => ['required', Rule::in(['programado', 'en_transito', 'finalizado', 'cancelado'])],
         ];
     }
@@ -42,6 +43,7 @@ class UpdateViajeRequest extends FormRequest
             'agencia_origen_id'       => 'agencia de origen',
             'agencia_destino_id'      => 'agencia de destino',
             'fecha_salida'            => 'fecha de salida',
+            'fecha_llegada'          => 'fecha de llegada',
             'estado'                  => 'estado',
         ];
     }
@@ -76,6 +78,9 @@ class UpdateViajeRequest extends FormRequest
             'fecha_salida.required' => 'La :attribute es obligatoria.',
             'fecha_salida.date'     => 'La :attribute debe ser una fecha válida.',
             'fecha_salida.after_or_equal' => 'La :attribute no puede ser anterior a hoy.',
+
+            'fecha_llegada.date'   => 'La :attribute debe ser una fecha válida.',
+            'fecha_llegada.after'  => 'La :attribute debe ser posterior a la fecha de salida.',
 
             'estado.required' => 'El :attribute es obligatorio.',
             'estado.in'       => 'El :attribute debe ser uno de los siguientes: programado, en_transito, finalizado, cancelado.',

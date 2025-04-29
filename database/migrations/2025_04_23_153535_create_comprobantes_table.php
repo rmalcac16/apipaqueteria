@@ -12,7 +12,7 @@ return new class extends Migration {
 
             $table->foreignId('pago_envio_id')->constrained('pago_envios')->onDelete('cascade');
 
-            $table->enum('tipo', ['01', '03']); // 01 = Factura, 03 = Boleta
+            $table->enum('tipo', ['01', '03'])->default('01');
             $table->string('serie', 4);
             $table->unsignedBigInteger('numero');
 

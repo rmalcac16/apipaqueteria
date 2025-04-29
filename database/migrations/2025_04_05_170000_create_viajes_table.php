@@ -50,6 +50,8 @@ return new class extends Migration
 
             $table->dateTime('fecha_salida');
 
+            $table->dateTime('fecha_llegada')->nullable();
+
             $table->enum('estado', ['programado', 'en_transito', 'finalizado', 'cancelado'])
                 ->default('programado');
 

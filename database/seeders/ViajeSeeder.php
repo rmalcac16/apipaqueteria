@@ -50,6 +50,7 @@ class ViajeSeeder extends Seeder
                 'agencia_origen_id'       => $agenciaOrigen,
                 'agencia_destino_id'      => $agenciaDestino,
                 'fecha_salida'            => now()->addDays($i),
+                'fecha_llegada'          => now()->addDays($i + 1),
                 'estado'                  => 'programado',
             ]);
         }

@@ -42,7 +42,7 @@ class StoreClienteRequest extends FormRequest
                 'max:255',
             ],
             'telefono' => [
-                'required',
+                'nullable',
                 'string',
                 'max:20',
                 'regex:/^[0-9+\s\-()]+$/',
@@ -84,7 +84,6 @@ class StoreClienteRequest extends FormRequest
             'direccion.string'        => 'La dirección debe ser una cadena de texto.',
             'direccion.max'           => 'La dirección no debe superar los 255 caracteres.',
 
-            'telefono.required'       => 'El teléfono es obligatorio.',
             'telefono.string'         => 'El teléfono debe ser una cadena de texto.',
             'telefono.regex'          => 'El formato del teléfono no es válido.',
             'telefono.max'            => 'El teléfono no debe superar los 20 caracteres.',

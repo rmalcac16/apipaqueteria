@@ -60,7 +60,7 @@ class ComprobanteService
     {
         return DB::transaction(function () use ($pago, $data) {
             $tipo = $data['tipo'] ?? '03';
-            $serie = $tipo === '01' ? env('SERIE_FACTURA', 'F101') : env('SERIE_BOLETA', 'B101');
+            $serie = $tipo === '01' ? getSetting('SERIE_FACTURA', 'F101') : getSetting('SERIE_BOLETA', 'B101');
 
             $ultimo = Comprobante::where('tipo', $tipo)
                 ->where('serie', $serie)
@@ -97,7 +97,7 @@ class ComprobanteService
             }
 
             return tap($this->find($comprobante->id), function ($comprobante) {
-                if (env('COMPROBANTE_SUNAT_AUTO', false)) {
+                if (getSetting('COMPROBANTE_SUNAT_AUTO', false)) {
                     try {
                         $this->enviarSunat($comprobante);
                     } catch (Throwable $e) {
@@ -153,6 +153,20 @@ class ComprobanteService
             ];
         }
 
+        // Cuotas
+        if ($comprobante->forma_pago === 'credito') {
+            $cuotas = [];
+
+            foreach ($comprobante->cuotas as $cuota) {
+                $cuotas[] = [
+                    'monto' => $cuota->monto,
+                    'fecha_pago' => $cuota->fecha_vencimiento,
+                ];
+            }
+        } else {
+            $cuotas = null;
+        }
+
 
         $data = [
             'tipo' => $comprobante->tipo,
@@ -163,21 +177,23 @@ class ComprobanteService
                 'num_doc' => $comprobante->cliente->numeroDocumento,
                 'razon_social' => $comprobante->cliente->nombreCompleto,
             ],
+            'forma_pago' => $comprobante->forma_pago,
             'empresa' => [
-                'ruc' => env('BUSINESS_RUC'),
-                'razon_social' => env('BUSINESS_NAME'),
-                'nombre_comercial' => env('BUSINESS_NAME_COMMERCIAL'),
-                'ubigeo' => env('BUSINESS_UBIGEO'),
-                'direccion' => env('BUSINESS_ADDRESS'),
-                'departamento' => env('BUSINESS_DEPARTAMENTO'),
-                'provincia' => env('BUSINESS_PROVINCIA'),
-                'distrito' => env('BUSINESS_DISTRITO'),
+                'ruc' => getSetting('BUSINESS_RUC'),
+                'razon_social' => getSetting('BUSINESS_NAME'),
+                'nombre_comercial' => getSetting('BUSINESS_NAME_COMMERCIAL'),
+                'ubigeo' => getSetting('BUSINESS_UBIGEO'),
+                'direccion' => getSetting('BUSINESS_ADDRESS'),
+                'departamento' => getSetting('BUSINESS_DEPARTAMENTO'),
+                'provincia' => getSetting('BUSINESS_PROVINCIA'),
+                'distrito' => getSetting('BUSINESS_DISTRITO'),
             ],
             'total_gravadas' => round($comprobante->monto_total / 1.18, 2),
             'igv' => round($comprobante->monto_total * 0.18 / 1.18, 2),
             'total' => round($comprobante->monto_total, 2),
             'leyenda' => 'SON ' . strtoupper((new NumeroALetras())->toWords($comprobante->monto_total, 2, 'SOLES')),
-            'items' => $items
+            'items' => $items,
+            'cuotas' => $cuotas,
         ];
 
         return $this->sunatComprobanteService->emitirComprobante($data, $comprobante);

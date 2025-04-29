@@ -26,7 +26,7 @@ class PagoEnvioSeeder extends Seeder
             'envio_id'           => 1,
             'monto'              => 850.00,
             'estado'             => 'completado',
-            'forma_pago'         => 'efectivo',
+            'metodo_pago'         => 'efectivo',
             'medio_pago'         => 'yape',
             'numero_transaccion' => 'YAPE001',
             'fecha_pago'         => now(),
@@ -46,7 +46,7 @@ class PagoEnvioSeeder extends Seeder
             'envio_id'           => 2,
             'monto'              => 1000.00,
             'estado'             => 'pendiente',
-            'forma_pago'         => 'transferencia',
+            'metodo_pago'         => 'transferencia',
             'medio_pago'         => 'bcp',
             'numero_transaccion' => 'BCP2024',
             'fecha_pago'         => now(),
@@ -57,7 +57,7 @@ class PagoEnvioSeeder extends Seeder
         ]);
 
         $comprobanteService->crearDesdePago($pago2, [
-            'tipo'        => '01', // factura
+            'tipo'        => '01',
             'forma_pago'  => 'credito',
             'cuotas' => [
                 ['monto' => 500, 'fecha_vencimiento' => now()->addDays(15)->toDateString()],

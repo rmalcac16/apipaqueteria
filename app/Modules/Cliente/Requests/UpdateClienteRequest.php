@@ -45,7 +45,7 @@ class UpdateClienteRequest extends FormRequest
                 'max:255',
             ],
             'telefono' => [
-                'required',
+                'nullable',
                 'string',
                 'max:20',
                 'regex:/^[0-9+\s\-()]+$/',
@@ -85,7 +85,6 @@ class UpdateClienteRequest extends FormRequest
 
             'direccion.max'           => 'La :attribute no debe superar los 255 caracteres.',
 
-            'telefono.required'       => 'El :attribute es obligatorio.',
             'telefono.regex'          => 'El formato del :attribute no es válido.',
             'telefono.max'            => 'El :attribute no debe superar los 20 caracteres.',
 

@@ -24,12 +24,16 @@
             margin: 0 auto;
         }
 
+        .uppercase {
+            text-transform: uppercase;
+        }
+
         .header,
         .client-info,
         .items,
         .totals,
         .footer {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         .header-table,
@@ -43,7 +47,7 @@
 
         .header-table td {
             vertical-align: top;
-            padding: 5px;
+            padding: 2px 2px;
         }
 
         .logo {
@@ -83,7 +87,7 @@
         }
 
         .client-table td {
-            padding: 4px 8px;
+            padding: 1px 8px;
             vertical-align: top;
         }
 
@@ -98,7 +102,7 @@
         .items-table th,
         .items-table td {
             border: 1px solid #ddd;
-            padding: 6px 8px;
+            padding: 2px 8px;
             word-wrap: break-word;
         }
 
@@ -129,7 +133,7 @@
         }
 
         .totals-table td {
-            padding: 6px 10px;
+            padding: 2px 10px;
         }
 
         .totals-table td:first-child {
@@ -227,6 +231,38 @@
             font-size: 9px;
             margin-top: 3px;
         }
+
+        /* Nuevos estilos para cuotas */
+        .payment-info {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+
+        .payment-method {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cuotas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 10px;
+            text-align: center
+        }
+
+        .cuotas-table th {
+            background-color: #f0f0f0;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .cuotas-table td {
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
     </style>
 </head>
 
@@ -273,14 +309,20 @@
                 </tr>
                 <tr>
                     <td>
-                        <strong>Documento:</strong>
-                        @if ($comprobante->cliente->tipoDocumento == '1')
-                            DNI
-                        @elseif($comprobante->cliente->tipoDocumento == '6')
-                            RUC
-                        @else
-                            DOC({{ $comprobante->cliente->tipoDocumento }})
-                        @endif
+                        <strong>
+                            @switch($comprobante->cliente->tipoDocumento)
+                                @case('1')
+                                    DNI:
+                                @break
+
+                                @case('6')
+                                    RUC:
+                                @break
+
+                                @default
+                                    DOC({{ $comprobante->cliente->tipoDocumento }}):
+                            @endswitch
+                        </strong>
                         {{ $comprobante->cliente->numeroDocumento }}
                     </td>
                     <td><strong>Dirección:</strong> {{ $comprobante->cliente->direccion ?? 'SIN DIRECCIÓN' }}</td>
@@ -315,8 +357,10 @@
                             <tr>
                                 <td class="num">{{ number_format($item->cantidad, 0) }}</td>
                                 <td>
-                                    <div class="text-bold">SERVICIO DE TRANSPORTE</div>
-                                    <div class="servicio-detalle">{{ $item->descripcion }}</div>
+                                    <div>
+                                        <span class="text-bold"> SERVICIO DE TRANSPORTE</span>
+                                        <span class="text-muted"> x ({{ $item->descripcion }})</span>
+                                    </div>
                                     @if ($comprobante->pago->envio->guiaRemision)
                                         <div class="guia-remision">
                                             Guía Remisión: {{ $comprobante->pago->envio->guiaRemision->codigo }}
@@ -368,6 +412,45 @@
                 </tr>
             </table>
         </div>
+
+        <!-- INFORMACIÓN DE PAGO Y CUOTAS -->
+        @if ($comprobante->forma_pago === 'credito')
+            <div class="payment-info">
+                <div class="payment-method">
+                    Forma de Pago: <span class="uppercase">{{ $comprobante->forma_pago ?? 'CONTADO' }}</span>
+                    @if ($comprobante->forma_pago === 'credito')
+                        ({{ $comprobante->cuotas->count() }} cuotas)
+                    @endif
+                </div>
+
+                @if ($comprobante->forma_pago === 'credito' && $comprobante->cuotas->count() > 0)
+                    <table class="cuotas-table">
+                        <thead>
+                            <tr>
+                                <th>N° Cuota</th>
+                                <th>Monto</th>
+                                <th>Fecha Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($comprobante->cuotas as $cuota)
+                                <tr>
+                                    <td class="num">{{ $cuota->numero_cuota }}</td>
+                                    <td class="num">S/ {{ number_format($cuota->monto, 2) }}</td>
+                                    <td>{{ date('d/m/Y', strtotime($cuota->fecha_vencimiento)) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+
+                @if ($comprobante->pago->metodo_pago)
+                    <div>
+                        Método de Pago: <span class="uppercase">{{ $comprobante->pago->metodo_pago }}</span>
+                    </div>
+                @endif
+            </div>
+        @endif
 
         <!-- QR Y CÓDIGO HASH MEJORADO -->
         @if ($comprobante->estado_sunat === 'aceptado' && !empty($comprobante->hash_code))

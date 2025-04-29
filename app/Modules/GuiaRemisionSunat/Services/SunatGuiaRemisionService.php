@@ -37,7 +37,6 @@ class SunatGuiaRemisionService
             ->setNombres($data['chofer']['nombres'])
             ->setApellidos($data['chofer']['apellidos']);
 
-
         $envio = new Shipment();
 
         $envio
@@ -104,6 +103,7 @@ class SunatGuiaRemisionService
             'doc' => $despatch,
         ]);
 
+
         // ENVÍO A SUNAT
         $api = SunatGuiaConfigHelper::getSeeApi();
 
@@ -121,6 +121,7 @@ class SunatGuiaRemisionService
         }
 
         file_put_contents(storage_path($xmlPath), $xmlFirmado);
+
 
         if (!$res->isSuccess()) {
             return [

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 class Viaje extends Model
 {
@@ -19,12 +20,39 @@ class Viaje extends Model
         'agencia_origen_id',
         'agencia_destino_id',
         'fecha_salida',
+        'fecha_llegada',
         'estado',
     ];
 
     protected $casts = [
         'fecha_salida' => 'datetime',
     ];
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->codigo)) {
+                $model->codigo = Viaje::generateUniqueCode();
+            }
+            if (Auth::check() && empty($model->user_id)) {
+                $model->user_id = Auth::id();
+            }
+        });
+    }
+
+    protected static function generateUniqueCode(): string
+    {
+        do {
+            $code = strtoupper(substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 6));
+        } while (self::where('codigo', $code)->exists());
+
+        return $code;
+    }
+
+
 
     // Quien creó el viaje
     public function creadoPor(): BelongsTo

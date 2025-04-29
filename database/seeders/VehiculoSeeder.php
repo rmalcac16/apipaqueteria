@@ -10,7 +10,7 @@ class VehiculoSeeder extends Seeder
     public function run(): void
     {
         // Tractocamiones
-        foreach (range(1, 5) as $i) {
+        foreach (range(1, 1) as $i) {
             Vehiculo::create([
                 'tipo'         => 'tractocamion',
                 'placa'        => 'TRC' . $this->generateAlphanumeric(3 + $i % 2), // Total de 6 a 8 caracteres
@@ -26,7 +26,7 @@ class VehiculoSeeder extends Seeder
         }
 
         // Semirremolques
-        foreach (range(1, 5) as $i) {
+        foreach (range(1, 1) as $i) {
             Vehiculo::create([
                 'tipo'         => 'semirremolque',
                 'placa'        => 'SMR' . $this->generateAlphanumeric(3 + $i % 2), // Total de 6 a 8 caracteres

@@ -51,6 +51,9 @@ return new class extends Migration
             $table->boolean('recojoDomicilio')->default(false);
             $table->string('recojo_direccion')->nullable();
             $table->string('recojo_ubigeo', 6)->nullable();
+            $table->string('recojo_distrito')->nullable();
+            $table->string('recojo_provincia')->nullable();
+            $table->string('recojo_departamento')->nullable();
             $table->string('recojo_referencia')->nullable();
             $table->string('recojo_telefono')->nullable();
 
@@ -61,11 +64,19 @@ return new class extends Migration
             $table->boolean('entregaDomicilio')->default(false);
             $table->string('entrega_direccion')->nullable();
             $table->string('entrega_ubigeo', 6)->nullable();
+            $table->string('entrega_distrito')->nullable();
+            $table->string('entrega_provincia')->nullable();
+            $table->string('entrega_departamento')->nullable();
             $table->string('entrega_referencia')->nullable();
             $table->string('entrega_telefono')->nullable();
 
             $table->decimal('pesoTotal', 8, 2)->nullable();
             $table->enum('unidadMedida', ['KGM', 'TN', 'LBR', 'OZ'])->default('KGM');
+            $table->decimal('valorDeclarado', 8, 2)->nullable();
+            $table->boolean('esFragil')->default(false);
+            $table->boolean('esPeligroso')->default(false);
+            $table->double('costoEnvio')->nullable();
+            $table->enum('formaPago', ['contado', 'contraentrega', 'credito'])->default('contado');
 
             $table->text('observaciones')->nullable();
 

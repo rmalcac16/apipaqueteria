@@ -147,7 +147,7 @@ class GuiaRemisionTransportistaService
             'serie' => $guia_remision_transportista->serie ?? getSetting('SERIE_GUIA_TRANSPORTISTA'),
             'correlativo' => $guia_remision_transportista->numero ?? '00000001',
             'empresa' => [
-                'ruc' => getSetting('BUSINESS_RUC'),
+                'ruc' =>  getSetting('SUNAT_GUIA_RUC', '20161515648'),
                 'razon_social' => getSetting('BUSINESS_NAME'),
                 'nro_mtc' => getSetting('BUSINESS_MTC') ?? '0000000001'
             ],

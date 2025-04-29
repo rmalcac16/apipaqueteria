@@ -14,14 +14,13 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            font-size: 10px;
+            font-size: 9px;
             width: 54mm;
             margin: 0 auto;
             padding: 2mm;
             line-height: 1.3;
             color: #000;
         }
-
 
         p,
         td,
@@ -53,11 +52,19 @@
         }
 
         .text-sm {
-            font-size: 9px;
+            font-size: 8px;
         }
 
         .text-xs {
-            font-size: 8px;
+            font-size: 7px;
+        }
+
+        .text-3xl {
+            font-size: 14px;
+        }
+
+        .text-4xl {
+            font-size: 18px;
         }
 
         .section {
@@ -131,8 +138,8 @@
         }
 
         .qr-code {
-            width: 60px;
-            height: 60px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto;
             border: 1px solid #eee;
         }
@@ -202,6 +209,30 @@
             color: #555;
             margin-top: 2px;
         }
+
+
+        .cuotas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+
+        .cuotas-table th {
+            background-color: #f0f0f0;
+            padding: 2px;
+            border: 1px solid #ddd;
+        }
+
+        .cuotas-table td {
+            padding: 2px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .condicion-pago {
+            font-weight: bold;
+            margin-top: 4px;
+        }
     </style>
 </head>
 
@@ -223,7 +254,7 @@
 
     <div class="section center">
         <p class="bold">{{ $comprobante->tipo === '03' ? 'BOLETA DE VENTA' : 'FACTURA' }} ELECTRÓNICA</p>
-        <p class="text-sm">{{ $comprobante->serie }}-{{ $comprobante->numero }}</p>
+        <p class="text-4xl bold">{{ $comprobante->serie }}-{{ $comprobante->numero }}</p>
     </div>
 
     <div class="section">
@@ -238,6 +269,13 @@
                     <p class="text-sm">SOLES (PEN)</p>
                 </td>
             </tr>
+            @if ($comprobante->forma_pago === 'credito')
+                <tr>
+                    <td colspan="2">
+                        <p class="condicion-pago">CONDICIÓN DE PAGO: CRÉDITO</p>
+                    </td>
+                </tr>
+            @endif
         </table>
     </div>
 
@@ -360,6 +398,31 @@
         <div class="total-letras">
             <p class="bold">SON: {{ $comprobante->monto_total_letras }}</p>
         </div>
+
+        <!-- Sección de cuotas (solo para crédito) -->
+        @if ($comprobante->forma_pago === 'credito' && $comprobante->cuotas && count($comprobante->cuotas) > 0)
+            <div style="margin-top: 6px;">
+                <p class="titulo">PLAN DE PAGOS</p>
+                <table class="cuotas-table">
+                    <thead>
+                        <tr>
+                            <th>N° Cuota</th>
+                            <th>Monto</th>
+                            <th>Fecha Venc.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($comprobante->cuotas as $cuota)
+                            <tr>
+                                <td>{{ $cuota->numero_cuota }}</td>
+                                <td>S/ {{ number_format($cuota->monto, 2) }}</td>
+                                <td>{{ date('d/m/Y', strtotime($cuota->fecha_vencimiento)) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 
     @if ($comprobante->estado_sunat === 'aceptado' && !empty($comprobante->hash_code))

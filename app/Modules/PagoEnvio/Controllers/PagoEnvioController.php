@@ -4,9 +4,9 @@ namespace Modules\PagoEnvio\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Modules\Pago\Requests\StorePagoEnvioRequest;
-use Modules\Pago\Requests\UpdatePagoEnvioRequest;
-use Modules\Pago\Services\PagoEnvioService;
+use Modules\PagoEnvio\Requests\StorePagoEnvioRequest;
+use Modules\PagoEnvio\Requests\UpdatePagoEnvioRequest;
+use Modules\PagoEnvio\Services\PagoEnvioService;
 
 class PagoEnvioController extends Controller
 {

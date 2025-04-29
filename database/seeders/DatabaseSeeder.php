@@ -14,15 +14,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            SettingsTableSeeder::class,
+            SettingsSeeder::class,
             AdminUserSeeder::class,
             AgenciaSeeder::class,
             UsuarioSeeder::class,
             ClienteSeeder::class,
             VehiculoSeeder::class,
-            ViajeSeeder::class,
-            EnvioSeeder::class,
-            PagoEnvioSeeder::class,
+            //ViajeSeeder::class,
+            // EnvioSeeder::class,
+            //PagoEnvioSeeder::class,
         ]);
     }
 }

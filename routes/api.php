@@ -3,6 +3,7 @@
 use App\Events\AgenciasUpdated;
 use App\Events\VehiculoActualizado;
 use App\Events\VehiculosUpdated;
+use App\Http\Controllers\Api\SettingsController;
 use App\Http\Middleware\CheckRole;
 
 use Illuminate\Http\Request;
@@ -90,6 +91,11 @@ Route::middleware(['auth:sanctum', CheckRole::class . ':admin,agente'])->group(f
 
     Route::post('guias-remision-transportista', [GuiaRemisionTransportistaController::class, 'store']);
     Route::post('comprobantes', [ComprobanteController::class, 'store']);
+
+    Route::prefix('settings')->controller(SettingsController::class)->group(function () {
+        Route::get('{key?}', 'show');
+        Route::put('{key?}', 'update');
+    });
 });
 
 Route::get('tracking', [EnvioController::class, 'trackingEnvio']);

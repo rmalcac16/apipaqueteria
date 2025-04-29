@@ -46,7 +46,7 @@ class AgenciaSeeder extends Seeder
             [
                 'nombre' => 'Cajamarca',
                 'codigo' => 'V03',
-                'direccion' => 'Av. La Paz 1282, Cajamarca',
+                'direccion' => 'Av. La Paz 1282',
                 'correo' => null,
                 'telefono' => null,
                 'ubigeo' => '060101',

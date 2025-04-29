@@ -14,7 +14,7 @@ class SunatGuiaConfigHelper
             'cpe' => getSetting('SUNAT_GUIA_CPE_URL', 'https://gre-test.nubefact.com/v1'),
         ]);
 
-        $certificate = file_get_contents(__DIR__ . '/../Resources/Certificados/cert.pem');
+        $certificate = file_get_contents(__DIR__ . '/../Resources/Certificados/certificate.pem');
 
         if ($certificate === false) {
             throw new Exception('No se pudo cargar el certificado de guía');

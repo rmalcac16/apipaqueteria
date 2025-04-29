@@ -19,12 +19,20 @@ class Agencia extends Model
         'provincia',
         'departamento',
         'estado',
-        'googleMapsUrl'
+        'googleMapsUrl',
+        'imagenUrl',
     ];
 
     protected $casts = [
         'estado' => 'boolean',
     ];
+
+    protected $appends = ['imagenUrlPublica'];
+
+    public function getImagenUrlPublicaAttribute()
+    {
+        return $this->imagenUrl ? asset('storage/' . $this->imagenUrl) : null;
+    }
 
     public function envios()
     {

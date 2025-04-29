@@ -32,6 +32,9 @@ class EnvioService
             'agenciaOrigen',
             'agenciaDestino',
             'items',
+            'pago',
+            'pago.comprobante',
+            'guiaRemision',
         ])->latest()->get();
     }
 
@@ -47,6 +50,9 @@ class EnvioService
             'agenciaOrigen',
             'agenciaDestino',
             'items',
+            'pago',
+            'pago.comprobante',
+            'guiaRemision',
         ])->findOrFail($id);
     }
 

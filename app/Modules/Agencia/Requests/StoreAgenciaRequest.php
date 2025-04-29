@@ -24,6 +24,7 @@ class StoreAgenciaRequest extends FormRequest
             'departamento' => 'nullable|string|max:100',
             'estado' => 'boolean',
             'googleMapsUrl' => 'nullable|string|max:255',
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
@@ -62,6 +63,12 @@ class StoreAgenciaRequest extends FormRequest
 
             'googleMapsUrl.string' => 'La URL de Google Maps debe ser un texto válido.',
             'googleMapsUrl.max' => 'La URL de Google Maps no debe superar los 255 caracteres.',
+
+            'image.image' => 'La imagen debe ser un archivo de imagen válido.',
+            'image.mimes' => 'La imagen debe ser de tipo: jpg, jpeg, png, webp.',
+            'image.max' => 'La imagen no debe pesar más de 2MB.',
+
+
         ];
     }
 
@@ -78,6 +85,7 @@ class StoreAgenciaRequest extends FormRequest
             'departamento' => 'Departamento',
             'estado' => 'Estado',
             'googleMapsUrl' => 'URL de Google Maps',
+            'image' => 'URL de la imagen',
         ];
     }
 }

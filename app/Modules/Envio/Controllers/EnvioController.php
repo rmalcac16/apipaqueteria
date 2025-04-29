@@ -60,7 +60,7 @@ class EnvioController extends Controller
         $envio = $this->envioService->find($id);
 
         $pdf = Pdf::loadView('pdf.envio.ticket_80', compact('envio'))
-            ->setPaper([0, 0, 226.77, 600], 'portrait');
+            ->setPaper([0, 0, 226.77, 750], 'portrait');
 
         return $pdf->stream("envio-{$envio->codigo}-ticket80.pdf");
     }

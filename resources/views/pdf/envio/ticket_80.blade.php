@@ -7,18 +7,18 @@
     <style>
         @page {
             margin: 0;
-            padding: 0;
             size: 80mm auto;
         }
 
         body {
             font-family: 'Arial', sans-serif;
-            font-size: 9.5px;
+            font-size: 12px;
             width: 76mm;
             margin: 0 auto;
-            padding: 2mm;
-            line-height: 1.25;
-            color: #333;
+            padding: 5mm 3mm;
+            line-height: 1.5;
+            color: #000;
+            background-color: #fff;
         }
 
         p,
@@ -46,229 +46,206 @@
             text-transform: uppercase;
         }
 
-        .text-sm {
-            font-size: 9px;
-        }
-
-        .text-xs {
-            font-size: 8px;
-        }
-
         .section {
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eaeaea;
-        }
-
-        .section:last-of-type {
-            border-bottom: none;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed #444;
         }
 
         .header {
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #000;
         }
 
-        .nombreEmpresa {
-            font-size: 13px;
+        .titulo {
             font-weight: bold;
-            color: #2c3e50;
-            letter-spacing: 0.5px;
+            font-size: 13px;
+            margin-bottom: 2px;
+            color: #111;
+        }
+
+        .text-xs {
+            font-size: 10px;
+        }
+
+        .text-sm {
+            font-size: 11px;
+        }
+
+        .text-md {
+            font-size: 13px;
+        }
+
+        .text-lg {
+            font-size: 15px;
+        }
+
+        .text-xl {
+            font-size: 17px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9px;
-            margin: 3px 0;
-        }
-
-        td,
-        th {
-            padding: 2px 0;
-            vertical-align: top;
-        }
-
-        .table-bordered td,
-        .table-bordered th {
-            border: 1px solid #ddd;
-            padding: 3px;
-        }
-
-        .domicilio-section {
-            background: #f8f9fa;
-            padding: 5px;
-            border-radius: 3px;
-            border-left: 3px solid #3498db;
-            margin: 4px 0;
-        }
-
-        .titulo {
-            font-weight: bold;
-            font-size: 9px;
-            margin-bottom: 3px;
-            color: #2c3e50;
-            border-bottom: 1px dotted #ccc;
-            padding-bottom: 2px;
-        }
-
-        .qr-container {
-            margin: 5px auto;
-            text-align: center;
-        }
-
-        .qr-code {
-            width: 50px;
-            height: 50px;
-            border: 1px solid #ddd;
-            padding: 3px;
-            background: white;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 5px;
-            background: #2c3e50;
-            color: white;
-            border-radius: 3px;
-            font-size: 8px;
-            font-weight: bold;
-        }
-
-        .footer {
-            font-size: 8px;
-            color: #7f8c8d;
-            text-align: center;
             margin-top: 5px;
         }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 5px;
-        }
-
-        .logo-img {
-            max-width: 50px;
-            max-height: 30px;
-        }
-
-        .alert {
-            background: #fff3cd;
+        .product-table th {
+            background-color: #e0e0e0;
+            border: 1px solid #333;
             padding: 4px;
-            border-radius: 3px;
-            border-left: 3px solid #ffc107;
-            font-size: 8px;
-            margin: 4px 0;
+            font-size: 11px;
         }
 
-        .two-columns {
-            width: 100%;
+        .product-table td {
+            border: 1px solid #333;
+            padding: 4px;
+            font-size: 11px;
         }
 
         .two-columns td {
             width: 50%;
             vertical-align: top;
+            padding-right: 5px;
         }
 
-        .atendido-por {
-            font-size: 8px;
-            text-align: right;
-            margin-bottom: 3px;
-            color: #555;
+        .qr-container {
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border: 1px solid #333;
+        }
+
+        .etiqueta {
+            background-color: #ffeeba;
+            border: 1px solid #ffc107;
+            padding: 2px 4px;
+            font-size: 9px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 4px;
+            color: #000;
         }
     </style>
 </head>
 
 <body>
 
+    <!-- ENCABEZADO -->
     <div class="header center">
-        <div class="logo">
-            <!-- Reemplazar con tu logo en base64 o URL -->
-            <div class="logo-img">[LOGO]</div>
-        </div>
-        <p class="nombreEmpresa">POPEYE CARGOS SAC</p>
-        <p class="text-sm">RUC: 12345678912</p>
-        <p class="text-sm">Calle Ignacio Cosio 1505 – La Victoria</p>
-        <p class="text-sm">Tel: 987654321 | www.popeyecargo.com</p>
+        <p class="text-lg bold">{{ getSetting('BUSINESS_NAME') }}</p>
+        <p class="text-sm">RUC: {{ getSetting('BUSINESS_RUC') }}</p>
+        <p class="text-sm">{{ getSetting('BUSINESS_ADDRESS') }}</p>
+        <p class="text-sm">TEL: {{ getSetting('BUSINESS_PHONE') }}</p>
     </div>
 
-    <div class="atendido-por">
-        Atendido por: {{ $envio->user->name }}
-        @if ($envio->user->rol === 'agente' && $envio->user->agencia)
-            ({{ $envio->user->agencia->nombre }})
-        @endif
-    </div>
-
+    <!-- TÍTULO -->
     <div class="section center">
-        <p class="uppercase bold" style="font-size: 11px; letter-spacing: 1px;">comprobante de envío</p>
-        <div class="badge">N° {{ $envio->numeroOrden }}</div>
+        <p class="text-xl bold">Orden #{{ $envio->numeroOrden }}</p>
+
+        @if ($envio->guiaRemision)
+            <p class="text-md bold">Guía de Remisión:
+                {{ $envio->guiaRemision->serie }}-{{ str_pad($envio->guiaRemision->numero, 8, '0', STR_PAD_LEFT) }}</p>
+        @endif
+
+        <p class="text-sm">Código: {{ $envio->codigo }}</p>
+        <p class="text-sm">Fecha: {{ date('d/m/Y H:i') }}</p>
     </div>
 
-    <table class="two-columns">
-        <tr>
-            <td>
-                <p class="text-sm"><strong>Código:</strong></p>
-                <p class="text-sm">{{ $envio->codigo }}</p>
-            </td>
-            <td>
-                @if ($envio->guiaRemision)
-                    <p class="text-sm"><strong>Guía:</strong></p>
-                    <p class="text-sm">{{ $envio->guiaRemision->codigo }}</p>
-                @endif
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class="text-sm"><strong>Fecha:</strong></p>
-                <p class="text-sm">{{ date('d/m/Y H:i') }}</p>
-            </td>
-            <td>
-                @if ($envio->guiaRemision)
-                    <p class="text-sm"><strong>Traslado:</strong></p>
-                    <p class="text-sm">{{ $envio->guiaRemision->fecha_inicio_traslado }}</p>
-                @endif
-            </td>
-        </tr>
-    </table>
+    <!-- DATOS DE PARTES -->
+    <div class="section">
+        <table class="two-columns">
+            <tr>
+                <td>
+                    <p class="titulo">Remitente</p>
+                    <p class="bold">{{ $envio->remitente->nombreCompleto }}</p>
+                    <p class="text-sm">DNI/RUC: {{ $envio->remitente->numeroDocumento }}</p>
+                    <p class="text-sm">Tel: {{ $envio->remitente->telefono }}</p>
+                </td>
+                <td>
+                    <p class="titulo">Destinatario</p>
+                    <p class="bold">{{ $envio->destinatario->nombreCompleto }}</p>
+                    <p class="text-sm">DNI/RUC: {{ $envio->destinatario->numeroDocumento }}</p>
+                    <p class="text-sm">Tel: {{ $envio->destinatario->telefono }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-    @if ($envio->recojoDomicilio)
-        <div class="section">
-            <p class="titulo">DATOS DE RECOJO</p>
-            <div class="domicilio-section">
-                <p class="text-sm bold">{{ $envio->recojo_direccion }}</p>
-                @if ($envio->recojo_referencia)
-                    <p class="text-sm"><strong>Ref.:</strong> {{ $envio->recojo_referencia }}</p>
-                @endif
-                @if ($envio->recojo_telefono)
-                    <p class="text-sm"><strong>Contacto:</strong> {{ $envio->recojo_telefono }}</p>
-                @endif
-            </div>
-        </div>
-    @endif
+    <!-- ORIGEN Y DESTINO -->
+    <div class="section">
+        <table class="two-columns">
+            <tr>
+                <td>
+                    <p class="titulo">Origen</p>
+                    <p class="bold">
+                        @if ($envio->recojoDomicilio)
+                            {{ $envio->recojo_direccion }}
+                        @else
+                            {{ $envio->agenciaOrigen->direccion }}
+                        @endif
+                    </p>
+                    <p class="text-sm">
+                        @if ($envio->recojoDomicilio)
+                            {{ $envio->recojo_distrito }} / {{ $envio->recojo_provincia }} /
+                            {{ $envio->recojo_departamento }}
+                        @else
+                            {{ $envio->agenciaOrigen->distrito }} / {{ $envio->agenciaOrigen->provincia }} /
+                            {{ $envio->agenciaOrigen->departamento }}
+                        @endif
+                    </p>
+                </td>
+                <td>
+                    <p class="titulo">Destino</p>
+                    <p class="bold">
+                        @if ($envio->entregaDomicilio)
+                            {{ $envio->entrega_direccion }}
+                        @else
+                            {{ $envio->agenciaDestino->direccion }}
+                        @endif
+                    </p>
+                    <p class="text-sm">
+                        @if ($envio->entregaDomicilio)
+                            {{ $envio->entrega_distrito }} / {{ $envio->entrega_provincia }} /
+                            {{ $envio->entrega_departamento }}
+                        @else
+                            {{ $envio->agenciaDestino->distrito }} / {{ $envio->agenciaDestino->provincia }} /
+                            {{ $envio->agenciaDestino->departamento }}
+                        @endif
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-    @if ($envio->entregaDomicilio)
-        <div class="section">
-            <p class="titulo">DATOS DE ENTREGA</p>
-            <div class="domicilio-section">
-                <p class="text-sm bold">{{ $envio->entrega_direccion }}</p>
-                @if ($envio->entrega_referencia)
-                    <p class="text-sm"><strong>Ref.:</strong> {{ $envio->entrega_referencia }}</p>
-                @endif
-                @if ($envio->entrega_telefono)
-                    <p class="text-sm"><strong>Contacto:</strong> {{ $envio->entrega_telefono }}</p>
-                @endif
-            </div>
-        </div>
-    @endif
+    {{-- ENTREGA --}}
 
     <div class="section">
-        <p class="titulo">DETALLE DEL ENVÍO</p>
-        <table class="table-bordered">
+        <p class="text-sm">
+            <strong class="bold uppercase">Entrega:</strong>
+            @if ($envio->entregaDomicilio)
+                {{ $envio->entrega_direccion }} / {{ $envio->entrega_distrito }} / {{ $envio->entrega_provincia }} /
+                {{ $envio->entrega_departamento }}
+            @else
+                ENTREGAR EN AGENCIA
+            @endif
+        </p>
+    </div>
+
+    <!-- DETALLE DEL ENVÍO -->
+    <div class="section">
+        <p class="titulo">Detalle del Envío</p>
+        <table class="product-table">
             <thead>
                 <tr>
-                    <th width="15%">Cant.</th>
-                    <th width="15%">UM</th>
+                    <th>Cant</th>
+                    <th>UM</th>
                     <th>Descripción</th>
                 </tr>
             </thead>
@@ -282,68 +259,67 @@
                 @endforeach
             </tbody>
         </table>
+        <p class="text-sm right" style="margin-top: 4px;">Peso: {{ number_format($envio->pesoTotal, 2) }}
+            {{ $envio->unidadMedida }}</p>
     </div>
 
-    <table class="two-columns">
-        <tr>
-            <td>
-                <p class="titulo">REMITENTE</p>
-                <p class="text-sm bold">{{ $envio->remitente->nombreCompleto }}</p>
-                <p class="text-sm">{{ $envio->remitente->numeroDocumento }}</p>
-                <p class="text-sm">{{ $envio->remitente->telefono }}</p>
-            </td>
-            <td>
-                <p class="titulo">DESTINATARIO</p>
-                <p class="text-sm bold">{{ $envio->destinatario->nombreCompleto }}</p>
-                <p class="text-sm">{{ $envio->destinatario->numeroDocumento }}</p>
-                <p class="text-sm">{{ $envio->destinatario->telefono }}</p>
-            </td>
-        </tr>
-    </table>
+    <!-- INFORMACIÓN FINAL -->
+    <div class="section center">
+        <p class="bold uppercase text-md">Total a Pagar</p>
+        <p class="bold" style="font-size: 18px;">S/ {{ number_format($envio->costoEnvio, 2) }}</p>
 
+        <div style="margin-top: 6px;">
+            <p class="bold text-md">Forma de pago:</p>
+            <p class="bold uppercase text-lg">{{ strtoupper($envio->formaPago) }}</p>
+        </div>
+
+        @if ($envio->valorDeclarado)
+            <p class="text-sm bold">Valor declarado: S/ {{ number_format($envio->valorDeclarado, 2) }}</p>
+        @endif
+
+        @if ($envio->esFragil || $envio->esPeligroso)
+            <div style="margin-top: 5px;">
+                @if ($envio->esFragil)
+                    <span class="etiqueta">FRÁGIL</span>
+                @endif
+                @if ($envio->esPeligroso)
+                    <span class="etiqueta" style="background-color: #f8d7da; border-color: #f5c2c7;">PELIGROSO</span>
+                @endif
+            </div>
+        @endif
+    </div>
+
+    <!-- OBSERVACIONES -->
     <div class="section">
-        <p class="titulo">RUTA</p>
+        <p class="titulo">Observaciones</p>
+        <p class="text-sm">• Carga recibida sin verificación de contenido.</p>
+        <p class="text-sm">• Remitente asume daños por embalaje/manipulación.</p>
+        <p class="text-sm">• Garantía: {{ $envio->contratoGarantia ? 'CONTRATADA' : 'NO CONTRATADA' }}</p>
+    </div>
+
+
+    <!-- ATENDIDO POR -->
+    <div class="section">
         <table class="two-columns">
             <tr>
                 <td>
-                    <p class="text-sm"><strong>Origen:</strong></p>
-                    <p class="text-sm">{{ $envio->agenciaOrigen->direccion }}</p>
-                    <p class="text-sm">{{ $envio->agenciaOrigen->distrito }} / {{ $envio->agenciaOrigen->provincia }}
-                        / {{ $envio->agenciaOrigen->departamento }}</p>
+                    <p class="text-sm bold">Atendido por:</p>
+                    <p class="text-sm">{{ $envio->user->name }}</p>
                 </td>
-                <td>
-                    <p class="text-sm"><strong>Destino:</strong></p>
-                    <p class="text-sm">{{ $envio->agenciaDestino->direccion }}</p>
-                    <p class="text-sm">{{ $envio->agenciaDestino->distrito }} /
-                        {{ $envio->agenciaDestino->provincia }} / {{ $envio->agenciaDestino->departamento }}
-                    </p>
+                <td class="right">
+                    <p class="text-sm bold">Impresión:</p>
+                    <p class="text-sm">{{ date('d/m/Y H:i:s') }}</p>
                 </td>
             </tr>
         </table>
     </div>
 
-    <div class="section">
-        <div class="qr-container">
-            <div class="qr-code">[QR]</div>
-            <p class="text-xs">Escanee para verificar el envío</p>
-        </div>
+    <!-- FOOTER -->
+    <div class="center text-xs" style="margin-top: 10px;">
+        <p>Gracias por confiar en nosotros</p>
+        <p>Consulta tu envío: {{ getSetting('BUSINESS_URL') }}</p>
     </div>
 
-    <div class="alert">
-        <p class="bold center text-xs uppercase">Importante</p>
-        <ul style="padding-left: 12px; margin: 3px 0;">
-            <li>Presente este comprobante para cualquier reclamo</li>
-            <li>El envío es válido por 48 horas desde su emisión</li>
-            <li>Verifique que los datos coincidan con su documento</li>
-        </ul>
-    </div>
-
-    <div class="footer">
-        <p>Gracias por confiar en nuestros servicios</p>
-        <p>Consulta el estado de tu envío: www.popeyecargo.com/consulta</p>
-        <p class="text-xs" style="margin-top: 3px;">{{ date('d/m/Y H:i:s') }} - Impreso por:
-            {{ $envio->user->name ?? 'Sistema' }}</p>
-    </div>
 </body>
 
 </html>

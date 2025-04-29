@@ -30,8 +30,10 @@ class ComprobanteController extends Controller
     {
         $comprobante = $this->service->find($id);
 
+        $tamanio = ($comprobante->tipo === "01" && $comprobante->forma_pago === "credito") ? 850 : 750;
+
         $pdf = Pdf::loadView('pdf.comprobante.ticket_80', compact('comprobante'))
-            ->setPaper([0, 0, 226.77, 600], 'portrait');
+            ->setPaper([0, 0, 226.77, $tamanio], 'portrait');
 
         return $pdf->stream("comprobante-{$comprobante->serie}-{$comprobante->numero}-ticket80.pdf");
     }
@@ -40,8 +42,10 @@ class ComprobanteController extends Controller
     {
         $comprobante = $this->service->find($id);
 
+        $tamanio = ($comprobante->tipo === "01" && $comprobante->forma_pago === "credito") ? 850 : 750;
+
         $pdf = Pdf::loadView('pdf.comprobante.ticket_58', compact('comprobante'))
-            ->setPaper([0, 0, 164.41, 700], 'portrait');
+            ->setPaper([0, 0, 164.41, $tamanio], 'portrait');
 
         return $pdf->stream("comprobante-{$comprobante->serie}-{$comprobante->numero}-ticket58.pdf");
     }

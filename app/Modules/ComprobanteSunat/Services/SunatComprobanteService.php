@@ -13,6 +13,8 @@ use Greenter\Model\Sale\FormaPagos\FormaPagoContado;
 use Modules\ComprobanteSunat\Helpers\SunatConfigHelper;
 use DOMDocument;
 use DOMXPath;
+use Greenter\Model\Sale\Cuota;
+use Greenter\Model\Sale\FormaPagos\FormaPagoCredito;
 
 class SunatComprobanteService
 {
@@ -48,7 +50,7 @@ class SunatComprobanteService
             ->setSerie($data['serie'])
             ->setCorrelativo($data['correlativo'])
             ->setFechaEmision(new DateTime())
-            ->setFormaPago(new FormaPagoContado()) // contado
+            ->setFormaPago($data['forma_pago'] === 'contado' ? new FormaPagoContado() : new FormaPagoCredito($data['total']))
             ->setTipoMoneda('PEN')
             ->setCompany($company)
             ->setClient($client)
@@ -58,6 +60,19 @@ class SunatComprobanteService
             ->setValorVenta($data['total_gravadas'])
             ->setSubTotal($data['total'])
             ->setMtoImpVenta($data['total']);
+
+        if ($data['forma_pago'] === 'credito') {
+
+            $cuotas = [];
+
+            foreach ($data['cuotas'] as $cuota) {
+                $cuotas[] = (new Cuota())
+                    ->setMonto($cuota['monto'])
+                    ->setFechaPago(new DateTime($cuota['fecha_pago']));
+            }
+
+            $invoice->setCuotas($cuotas);
+        }
 
         $items = [];
 

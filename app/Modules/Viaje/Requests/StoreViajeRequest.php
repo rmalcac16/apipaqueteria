@@ -15,8 +15,6 @@ class StoreViajeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'codigo'                  => 'required|string|max:50|unique:viajes,codigo',
-            'user_id'                 => 'required|exists:users,id',
             'vehiculo_principal_id'   => 'required|exists:vehiculos,id',
             'vehiculo_secundario_id'  => 'nullable|exists:vehiculos,id',
             'conductor_principal_id'  => 'required|exists:users,id',
@@ -24,15 +22,13 @@ class StoreViajeRequest extends FormRequest
             'agencia_origen_id'       => 'required|exists:agencias,id',
             'agencia_destino_id'      => 'required|exists:agencias,id|different:agencia_origen_id',
             'fecha_salida'            => 'required|date|after_or_equal:today',
-            'estado'                  => ['required', Rule::in(['programado', 'en_transito', 'finalizado', 'cancelado'])],
+            'fecha_llegada'          => 'nullable|date|after:fecha_salida'
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'codigo'                  => 'código',
-            'user_id'                 => 'usuario creador',
             'vehiculo_principal_id'   => 'vehículo principal',
             'vehiculo_secundario_id'  => 'vehículo secundario',
             'conductor_principal_id'  => 'conductor principal',
@@ -40,19 +36,13 @@ class StoreViajeRequest extends FormRequest
             'agencia_origen_id'       => 'agencia de origen',
             'agencia_destino_id'      => 'agencia de destino',
             'fecha_salida'            => 'fecha de salida',
-            'estado'                  => 'estado',
+            'fecha_llegada'          => 'fecha de llegada',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'codigo.required'     => 'El :attribute es obligatorio.',
-            'codigo.unique'       => 'El :attribute ya ha sido registrado.',
-            'codigo.max'          => 'El :attribute no debe exceder los :max caracteres.',
-
-            'user_id.required'    => 'El :attribute es obligatorio.',
-            'user_id.exists'      => 'El :attribute seleccionado no existe.',
 
             'vehiculo_principal_id.required' => 'El :attribute es obligatorio.',
             'vehiculo_principal_id.exists'   => 'El :attribute seleccionado no existe.',
@@ -75,8 +65,9 @@ class StoreViajeRequest extends FormRequest
             'fecha_salida.date'     => 'La :attribute debe ser una fecha válida.',
             'fecha_salida.after_or_equal' => 'La :attribute no puede ser anterior a hoy.',
 
-            'estado.required' => 'El :attribute es obligatorio.',
-            'estado.in'       => 'El :attribute debe ser uno de los siguientes: programado, en_transito, finalizado, cancelado.',
+            'fecha_llegada.date'   => 'La :attribute debe ser una fecha válida.',
+            'fecha_llegada.after'  => 'La :attribute debe ser posterior a la fecha de salida.',
+
         ];
     }
 }
